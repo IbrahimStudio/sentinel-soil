@@ -1,0 +1,89 @@
+# -----------------------
+# Python / Packaging
+# -----------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+pip-wheel-metadata/
+*.whl
+
+# -----------------------
+# Virtual environments
+# -----------------------
+.venv/
+venv/
+env/
+ENV/
+
+# -----------------------
+# IDE / Editor files
+# -----------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -----------------------
+# OS files
+# -----------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------
+# Project-specific ignores
+# -----------------------
+
+# Local configuration (contains paths, AOI name, credentials placeholders)
+configs/*.local.yaml
+configs/*secret*.yaml
+
+# If using .env files for credentials
+.env
+.env.*
+
+# -----------------------
+# Raster Data
+# -----------------------
+data/raw/
+data/indices/
+data/metadata/
+
+# If using intermediate cubes or numpy arrays
+*.npy
+*.npz
+*.zarr/
+*.h5
+
+# Large Geospatial Files
+*.tif
+*.tiff
+*.vrt
+*.jp2
+*.nc
+*.parquet
+*.cog.tif
+
+# -----------------------
+# Logs / Cache
+# -----------------------
+logs/
+*.log
+*.out
+*.err
+.cache/
+tmp/
+temp/
+checkpoint/
+checkpoints/
+
+# -----------------------
+# Jupyter Notebook junk
+# -----------------------
+.ipynb_checkpoints/
+*.ipynb_edit*

@@ -1,0 +1,34 @@
+cdse:
+  auth_url: "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
+  client_id: ${CDSE_CLIENT_ID}
+  client_secret: ${CDSE_CLIENT_SECRET}
+
+sentinelhub:
+  process_url: "https://sh.dataspace.copernicus.eu/api/v1/process"
+  catalog_url: "https://sh.dataspace.copernicus.eu/api/v1/catalog/1.0.0/search"
+
+data:
+  base_dir: "./data"
+  raw_dir: "raw"
+  indices_dir: "indices"
+  metadata_dir: "metadata"
+
+aoi:
+  name: "field_A"
+  crs: 4326
+  bbox: [10.0, 44.5, 10.5, 45.0]
+
+temporal:
+  start_date: "2024-06-01"
+  end_date: "2024-06-30"
+  max_cloud_cover: 20
+
+sentinel2:
+  collection: "sentinel-2-l2a"
+  bands:
+    - B02
+    - B03
+    - B04
+    - B08
+    - B11
+    - B12
