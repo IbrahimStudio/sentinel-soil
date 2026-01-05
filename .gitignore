@@ -53,6 +53,7 @@ configs/*secret*.yaml
 data/raw/
 data/indices/
 data/metadata/
+data/
 
 # If using intermediate cubes or numpy arrays
 *.npy

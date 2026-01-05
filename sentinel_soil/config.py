@@ -5,8 +5,10 @@ import yaml
 import os
 from dotenv import load_dotenv
 
+load_dotenv()
 
-@dataclass@
+
+@dataclass
 class CDSEConfig:
     auth_url: str
     client_id: str
@@ -63,8 +65,8 @@ def load_config(path: str | Path) -> AppConfig:
 
     cdse_conf = CDSEConfig(
         auth_url=raw["cdse"]["auth_url"],
-        client_secret = raw["cdse"].get("client_secret") or os.getenv("CDSE_CLIENT_SECRET"),
-        client_secret=raw["cdse"].get("client_secret") or os.getenv("CDSE_CLIENT_SECRET"),
+        client_id=os.getenv("CDSE_CLIENT_ID"),
+        client_secret=os.getenv("CDSE_CLIENT_SECRET"),
     )
 
     sh_conf = SentinelHubConfig(
