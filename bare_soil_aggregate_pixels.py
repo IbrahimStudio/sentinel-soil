@@ -12,6 +12,57 @@ from rasterio.transform import xy
 import matplotlib.pyplot as plt
 
 
+def build_seed_point_features(
+    feat_df: pd.DataFrame,
+    lat: float,
+    lon: float,
+    window_m: float,
+    start_date: str,
+    end_date: str,
+    min_obs: int,
+) -> pd.DataFrame:
+    """
+    Build a single-row DataFrame summarizing the window (seed point) by aggregating
+    per-pixel features across space.
+    """
+
+    out = {
+        "lat": lat,
+        "lon": lon,
+        "window_m": window_m,
+        "start_date": start_date,
+        "end_date": end_date,
+        "min_obs_baresoil": min_obs,
+        "n_pixels": int(len(feat_df)),
+        "n_pixels_with_min_obs": int((feat_df["n_obs_baresoil"] >= min_obs).sum()),
+        "mean_n_obs_baresoil": float(feat_df["n_obs_baresoil"].mean()),
+        "median_n_obs_baresoil": float(feat_df["n_obs_baresoil"].median()),
+    }
+
+    # Only use pixels that have enough observations
+    valid = feat_df[feat_df["n_obs_baresoil"] >= min_obs].copy()
+
+    # Aggregate all numeric feature columns across pixels
+    # Exclude identifiers
+    exclude = {"row", "col", "x", "y", "n_obs_baresoil"}
+    feature_cols = [c for c in valid.columns if c not in exclude and pd.api.types.is_numeric_dtype(valid[c])]
+
+    for col in feature_cols:
+        s = valid[col].dropna()
+        if s.empty:
+            out[f"{col}_space_median"] = np.nan
+            out[f"{col}_space_mean"] = np.nan
+            out[f"{col}_space_std"] = np.nan
+            continue
+
+        out[f"{col}_space_median"] = float(s.median())
+        out[f"{col}_space_mean"] = float(s.mean())
+        out[f"{col}_space_std"] = float(s.std(ddof=0))
+
+    return pd.DataFrame([out])
+
+
+
 def safe_point_name(lat: float, lon: float) -> str:
     return f"point_{lat:.6f}_{lon:.6f}".replace(".", "p")
 

@@ -29,3 +29,7 @@ Index(['row', 'col', 'x', 'y', 'B02_median_bs', 'B02_mean_bs', 'B02_std_bs',
        'MSAVI_mean_bs', 'MSAVI_std_bs', 'EVI_median_bs', 'EVI_mean_bs',
        'EVI_std_bs', 'n_obs_baresoil'],
       dtype='object')
+
+
+citations: https://developers.google.com/earth-engine/datasets/catalog/JRC_LUCAS_HARMO_THLOC_V1?utm_source=chatgpt.com&hl=it#description
+LUCAS
