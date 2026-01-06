@@ -32,3 +32,26 @@ sentinel2:
     - B08
     - B11
     - B12
+
+batch:
+  name: lucas_sentinel_bs
+  seeds_csv: data\seed_data\lucas_2015_seed.xlsx
+
+  # AOI / spatial
+  window_m: 100.0
+  dst_epsg: 32632
+  size: [10, 10]          # width, height in pixels
+
+  # time
+  start_date: "2024-06-01"
+  end_date: "2024-06-30"
+
+  # bands
+  bands: ["B02","B03","B04","B08","B11","B12"]
+
+  # filtering / aggregation
+  ndvi_threshold: 0.2
+  min_obs_baresoil: 2
+
+  # SentinelHub dataFilter
+  max_cloud_coverage: 80

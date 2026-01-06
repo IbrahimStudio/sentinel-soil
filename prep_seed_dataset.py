@@ -9,7 +9,7 @@ LUCAS_2009_CSV = Path("data\LUCAS_DS\LUCAS_TOPSOIL_v1.xlsx")
 
 OUT_CSV = Path("data\LUCAS_DS\lucas_2015_with_coords.csv")
 OUT_PARQUET = Path("data\LUCAS_DS\lucas_2015_with_coords.parquet")
-
+OUT_EXCEL = Path("data\LUCAS_DS\lucas_2015_with_coords.xlsx")
 # -------------------------
 # Load
 # -------------------------
@@ -53,6 +53,13 @@ df_2009_lookup = (
 
 print(f"Unique POINT_IDs in 2009 lookup: {len(df_2009_lookup)}")
 
+print(df_2009_lookup[["GPS_LAT", "GPS_LONG"]].head())
+print(df_2009_lookup[["GPS_LAT", "GPS_LONG"]].describe(include="all"))
+lat_max = pd.to_numeric(df_2009_lookup["GPS_LAT"], errors="coerce").max()
+lat_min = pd.to_numeric(df_2009_lookup["GPS_LAT"], errors="coerce").min()
+print("2009 GPS_LAT min/max:", lat_min, lat_max)
+
+
 # -------------------------
 # LEFT JOIN (2015 ← 2009)
 # -------------------------
@@ -85,7 +92,9 @@ if missing_coords > 0:
 # -------------------------
 df_joined.to_csv(OUT_CSV, index=False)
 df_joined.to_parquet(OUT_PARQUET, index=False)
+df_joined.to_excel(OUT_EXCEL, index=False)
 
 print("Saved outputs:")
 print(f" - {OUT_CSV}")
 print(f" - {OUT_PARQUET}")
+print(f" - {OUT_EXCEL}")
