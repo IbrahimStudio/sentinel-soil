@@ -4,6 +4,8 @@ import shutil
 from pathlib import Path
 from typing import List
 
+from dotenv import load_dotenv
+
 import numpy as np
 import pandas as pd
 import rasterio
@@ -24,6 +26,8 @@ from sentinel_soil.features.feature_engineering import (
     stack_to_long_dataframe,
     add_indices,
 )
+
+load_dotenv()
 
 
 def safe_point_name(lat: float, lon: float) -> str:
@@ -237,7 +241,7 @@ def main(config_path: str = "configs/dev.yaml"):
     sh = SentinelHubClient(creds)
 
     seeds_csv = cfg.batch.seeds_csv
-    df_seeds = pd.read_csv(seeds_csv)
+    df_seeds = pd.read_excel(seeds_csv)
 
     if "lat" not in df_seeds.columns or "lon" not in df_seeds.columns:
         raise ValueError("seeds CSV must contain columns: lat, lon (and optionally seed_id)")

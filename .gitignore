@@ -42,6 +42,7 @@ Thumbs.db
 # Local configuration (contains paths, AOI name, credentials placeholders)
 configs/*.local.yaml
 configs/*secret*.yaml
+configs/*
 
 # If using .env files for credentials
 .env
@@ -88,3 +89,6 @@ checkpoints/
 # -----------------------
 .ipynb_checkpoints/
 *.ipynb_edit*
+
+
+configs\dev.yaml
