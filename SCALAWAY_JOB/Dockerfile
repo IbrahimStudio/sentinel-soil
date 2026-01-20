@@ -57,4 +57,4 @@ USER appuser
 ENTRYPOINT ["/usr/bin/tini","--"]
 
 # Default command (override in Scaleway Jobs)
-CMD ["uv", "run", "python", "-m", "pipeline.run_worker", "--help"]
+CMD ["uv", "run", "python", "-m", "pipeline.worker", "--help"]
