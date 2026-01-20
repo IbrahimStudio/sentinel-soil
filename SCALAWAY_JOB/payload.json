@@ -1,0 +1,10 @@
+{
+  "job_id": "TEST_POINT123__w3x3__ndvi0.2__minobs2",
+  "point_id": "POINT123",
+  "lat": 44.8915307,
+  "lon": 10.01263632,
+  "survey_date": "2018-05-20",
+  "spatial_window": {"type": "pixel_window", "w": 3, "h": 3},
+  "ndvi_threshold": 0.2,
+  "min_obs": 2
+}
