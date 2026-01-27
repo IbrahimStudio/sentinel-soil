@@ -32,7 +32,6 @@ sentinel2:
     - B08
     - B11
     - B12
-    - VALID
 
 batch:
   name: lucas_sentinel_bs
@@ -48,7 +47,7 @@ batch:
   # end_date: "2024-06-30"
 
   # bands
-  bands: ["B02","B03","B04","B08","B11","B12", "VALID"]
+  bands: ["B02","B03","B04","B08","B11","B12"]
 
   # filtering / aggregation
   ndvi_threshold: 0.2

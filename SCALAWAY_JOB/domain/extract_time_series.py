@@ -117,17 +117,19 @@ def extract_one(
     *,
     lat: float,
     lon: float,
-    survey_date: Union[str, date, datetime, pd.Timestamp],
+    survey_date: str,
     window_days: int,
+    start_date: str | None = None,
+    end_date: str | None = None,
     pixel_window_w: int,
     pixel_window_h: int,
-    res_m: float = 10.0,
-    config_path: str = "configs/dev.yaml",
-    point_id: Optional[str] = None,
-    max_cloud_coverage: int = 80,
-    mosaicking_order: str = "leastCC",
+    res_m: int,
+    config_path: str,
+    point_id: str,
+    max_cloud_coverage: float,
+    mosaicking_order: str,
     out_root: Path,
-    logger: Optional[logging.Logger] = None,
+    logger: logging.Logger | None = None,
 ) -> Path:
     """
     Minimal extraction for a single job.
@@ -149,7 +151,23 @@ def extract_one(
     cfg = load_config(config_path)
 
     survey = _parse_survey_date(survey_date)
-    start_date, end_date = _compute_interval_around_survey(survey, window_days)
+    def _parse_yyyy_mm_dd(s: str) -> date:
+        return datetime.strptime(s, "%Y-%m-%d").date()
+
+    if start_date and end_date:
+        start = _parse_yyyy_mm_dd(start_date)
+        end = _parse_yyyy_mm_dd(end_date)
+        if end < start:
+            raise ValueError(f"end_date < start_date: {start_date} > {end_date}")
+    else:
+        # existing behavior (keep exactly what you do today)
+        sd = _parse_yyyy_mm_dd(survey_date)
+        half = int(window_days) // 2
+        start = sd - timedelta(days=half)
+        end = sd + timedelta(days=half)
+
+    time_interval = (start.isoformat(), end.isoformat())
+    logger.info(f"[{point_id}] Using time interval: {time_interval[0]} → {time_interval[1]}")
 
     # keep your same band set
     bands = ["B02", "B03", "B04", "B08", "B11", "B12"]
@@ -226,12 +244,16 @@ def extract_one(
         shutil.copy2(userdata_candidates[0], stacked_dir / "userdata.json")
 
     # produce per-date rasters for feature step
+    bands_core = ["B02","B03","B04","B08","B11","B12"]
+    bands_per_date = bands_core + ["VALID"]
+
     _split_stacked_tif_to_per_date(
         stacked_tif=stacked_tif,
         dates=dates,
-        bands=bands,
+        bands=bands_per_date,
         out_dir=per_date_dir,
     )
+
 
     # cleanup tmp
     shutil.rmtree(tmp_dir, ignore_errors=True)

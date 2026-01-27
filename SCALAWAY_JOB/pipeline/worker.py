@@ -30,9 +30,12 @@ def run_one_job(payload: Dict[str, Any], *, config_path: str = "configs/dev.yaml
 
     logger.info(
         f"Starting job_id={job.job_id} point_id={job.point_id} "
-        f"({job.lat},{job.lon}) survey={job.survey_date} window={job.window.w}x{job.window.h} "
+        f"({job.lat},{job.lon}) survey={job.survey_date} "
+        f"range=({getattr(job,'start_date',None)},{getattr(job,'end_date',None)}) "
+        f"window={job.window.w}x{job.window.h} "
         f"ndvi<{job.ndvi_threshold} min_obs={job.min_obs}"
     )
+
 
     try:
         # Clean local folders if rerun (leave logs)
@@ -47,6 +50,8 @@ def run_one_job(payload: Dict[str, Any], *, config_path: str = "configs/dev.yaml
             lon=job.lon,
             survey_date=job.survey_date,
             window_days=job.window_days,
+            start_date=getattr(job, "start_date", None),
+            end_date=getattr(job, "end_date", None),
             pixel_window_w=job.window.w,
             pixel_window_h=job.window.h,
             res_m=job.res_m,
@@ -57,6 +62,7 @@ def run_one_job(payload: Dict[str, Any], *, config_path: str = "configs/dev.yaml
             out_root=paths.local_intermediate_root,
             logger=logger,
         )
+
 
         # Upload intermediate
         # NOTE: uploading ts_root (not the whole local_intermediate_root) keeps remote keys tidy
@@ -132,6 +138,8 @@ def run_one_job(payload: Dict[str, Any], *, config_path: str = "configs/dev.yaml
             "traceback": tb[-8000:],
             "logs_prefix": paths.obj_logs_prefix,
             "intermediate_prefix": paths.obj_intermediate_prefix,
+            "start_date": getattr(job, "start_date", None),
+            "end_date": getattr(job, "end_date", None),
         }
         storage.put_text(
             paths.obj_manifest_key,

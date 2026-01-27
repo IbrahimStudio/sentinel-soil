@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 @dataclass(frozen=True)
@@ -22,6 +22,8 @@ class JobSpec:
     window: PixelWindow
     ndvi_threshold: float
     min_obs: int
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
 
     # optional knobs (defaults for job runner)
     window_days: int = 30
