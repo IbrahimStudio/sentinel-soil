@@ -83,7 +83,6 @@ function evaluatePixel(samples) {{
 }}
 """
 
-
 def build_orbit_timeseries_evalscript_filtered(
     bands: List[str],
     *,
@@ -92,34 +91,25 @@ def build_orbit_timeseries_evalscript_filtered(
     use_ndwi_guard: bool = True,
     use_bsi_guard: bool = False,
 ) -> str:
-    """
-    ORBIT mosaicking with per-pixel filtering using SCL + index thresholds.
-    Output layout per observation:
-      [band1, band2, ..., bandN, validMask]
-    Invalid observations return NaN for bands and 0 for validMask.
-    """
+    # Spectral bands we want to output (reflectance)
+    out_bands = bands[:]  # e.g. ["B02","B03","B04","B08","B11","B12"]
 
-    # Ensure needed bands exist for indices
-    required = set(bands)
-    required.add("SCL")
-    required.add("dataMask")
-    required.add("B04")  # red for NDVI
-    required.add("B08")  # nir for NDVI
+    # Ensure needed spectral bands exist for indices
+    required_spec = set(out_bands)
+    required_spec.update({"B04", "B08"})  # NDVI
     if use_ndwi_guard:
-        required.add("B03")  # green for NDWI
+        required_spec.add("B03")
     if use_bsi_guard:
-        required.add("B11")  # SWIR1 for BSI
+        required_spec.update({"B02", "B11"})
 
-    # Keep user-specified order for output bands, but inputs must include extras
-    input_bands = sorted(required)  # deterministic
+    # Inputs: reflectance spectral bands + DN classification bands
+    spec_input_bands = sorted(required_spec)
+    spec_bands_js = "[" + ", ".join(f'"{b}"' for b in spec_input_bands) + "]"
 
-    bands_js = "[" + ", ".join(f'"{b}"' for b in input_bands) + "]"
-    out_return = ", ".join(f"sample.{b}" for b in bands)  # only the requested bands in output
+    out_return = ", ".join(f"sample.{b}" for b in out_bands)
+    n_out = len(out_bands)
+    per_obs_out_len = n_out + 1  # + VALID
 
-    n_out = len(bands)
-    per_obs_out_len = n_out + 1  # + mask
-
-    # JS snippets for optional guards
     ndwi_guard_js = (
         "var ndwi = (sample.B03 - sample.B08) / (sample.B03 + sample.B08);\n"
         "if (!(ndwi < 0.0)) { valid = false; }\n"
@@ -138,10 +128,16 @@ def build_orbit_timeseries_evalscript_filtered(
     return f"""//VERSION=3
 function setup() {{
   return {{
-    input: [{{
-      bands: {bands_js},
-      units: "{units}"
-    }}],
+    input: [
+      {{
+        bands: {spec_bands_js},
+        units: "{units}"
+      }},
+      {{
+        bands: ["SCL", "dataMask"],
+        units: "DN"
+      }}
+    ],
     output: {{
       bands: 1,
       sampleType: SampleType.FLOAT32
@@ -171,34 +167,30 @@ function evaluatePixel(samples) {{
   for (var i = 0; i < samples.length; i++) {{
     var sample = samples[i];
 
-    // --- base validity ---
     var valid = true;
 
-    // no-data guard
+    // dataMask guard
     if (sample.dataMask === 0) {{
       valid = false;
     }}
 
-    // SCL guard: keep ONLY bare soil (5)
-    // Excludes water (6), vegetation (4), shadows (3), clouds (7-10), snow (11), etc.
+    // SCL guard: bare soil only
     if (sample.SCL !== 5) {{
       valid = false;
     }}
 
-    // NDVI guard: remove sparse vegetation / residues
+    // NDVI guard
     var ndvi = (sample.B08 - sample.B04) / (sample.B08 + sample.B04);
     if (!(ndvi < {ndvi_max})) {{
       valid = false;
     }}
 
-    // Optional extra guards
     {ndwi_guard_js}
     {bsi_guard_js}
 
     if (valid) {{
       out = out.concat([{out_return}, 1.0]);
     }} else {{
-      // return NaNs for bands + 0 mask
       var nan = NaN;
       var arr = [];
       for (var k = 0; k < {n_out}; k++) arr.push(nan);

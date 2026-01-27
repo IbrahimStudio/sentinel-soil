@@ -17,9 +17,26 @@ from utils.evalscript_builder import build_orbit_timeseries_evalscript, build_or
 from utils.geometry import bbox_for_grid_around_point  # must accept width/height px + res_m
 
 import logging
+from datetime import date, datetime, time, timezone
 
 
-import logging
+DateLike = Union[str, date, datetime]
+
+def _to_date(d: DateLike) -> date:
+    if isinstance(d, datetime):
+        return d.date()
+    if isinstance(d, date):
+        return d
+    # string
+    return datetime.strptime(d, "%Y-%m-%d").date()
+
+def _to_iso8601_utc_start(d: DateLike) -> str:
+    dd = _to_date(d)
+    return datetime.combine(dd, time.min, tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
+
+def _to_iso8601_utc_end(d: DateLike) -> str:
+    dd = _to_date(d)
+    return datetime.combine(dd, time.max, tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 # -----------------------------
@@ -151,7 +168,9 @@ def extract_one(
     cfg = load_config(config_path)
 
     survey = _parse_survey_date(survey_date)
-    def _parse_yyyy_mm_dd(s: str) -> date:
+    def _parse_yyyy_mm_dd(s: str | date) -> date:
+        if isinstance(s, date):
+            return s
         return datetime.strptime(s, "%Y-%m-%d").date()
 
     if start_date and end_date:
@@ -208,23 +227,28 @@ def extract_one(
     sh = SentinelHubClient(creds)
 
     evalscript = build_orbit_timeseries_evalscript_filtered(bands=bands, units="REFLECTANCE")
+    
+    time_interval = (
+        _to_iso8601_utc_start(start_date),
+        _to_iso8601_utc_end(end_date),
+    )
 
     logger.info(
         f"Extracting time series: id_part={id_part} size={pixel_window_w}x{pixel_window_h} "
-        f"res={res_m}m interval={start_date}..{end_date} cloud<={max_cloud_coverage}"
+        f"res={res_m}m interval={time_interval[0]}..{time_interval[1]} cloud<={max_cloud_coverage}"
     )
 
-    # Sentinel Hub request
     sh.request_tiff(
         evalscript=evalscript,
         bbox=bbox,
         crs_epsg=epsg,
-        time_interval=(start_date, end_date),
+        time_interval=time_interval,
         size=size,
         max_cloud_coverage=max_cloud_coverage,
         output_folder=str(tmp_dir),
         mosaicking_order=mosaicking_order,
     )
+
 
     _extract_response_tar(tmp_dir)
 

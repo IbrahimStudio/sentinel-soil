@@ -1,10 +1,19 @@
 {
-  "job_id": "03",
+  "job_id": "04",
   "point_id": "POINT123",
   "lat": 44.8915307,
   "lon": 10.01263632,
   "survey_date": "2018-05-20",
-  "spatial_window": {"type": "pixel_window", "w": 3, "h": 3},
+
+  "start_date": "2016-01-01",
+  "end_date": "2020-01-27",
+
+  "spatial_window": { "type": "pixel_window", "w": 3, "h": 3 },
+  "res_m": 10,
+
   "ndvi_threshold": 0.2,
-  "min_obs": 2
+  "min_obs": 2,
+
+  "max_cloud_coverage": 100,
+  "mosaicking_order": "mostRecent"
 }

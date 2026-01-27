@@ -98,6 +98,9 @@ def parse_job(payload: Dict[str, Any]) -> JobSpec:
 
     mosaicking_order = str(payload.get("mosaicking_order", "leastCC"))
 
+    start_date = str(payload.get('start_date'))
+    end_date = str(payload.get('end_date'))
+
     return JobSpec(
         job_id=str(payload["job_id"]).strip(),
         point_id=str(payload["point_id"]).strip(),
@@ -111,4 +114,6 @@ def parse_job(payload: Dict[str, Any]) -> JobSpec:
         res_m=res_m,
         max_cloud_coverage=max_cloud_coverage,
         mosaicking_order=mosaicking_order,
+        start_date=start_date,
+        end_date=end_date
     )

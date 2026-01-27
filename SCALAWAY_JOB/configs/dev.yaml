@@ -1,7 +1,7 @@
 cdse:
   auth_url: "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
-  client_id: ""
-  client_secret: ""
+  client_id: "sh-15574bf9-2364-44da-9791-9a181d0ce9b6"
+  client_secret: "N0XLtfcExXuYgeRnPaSfOf91Pi719wRo"
 
 sentinelhub:
   process_url: "https://sh.dataspace.copernicus.eu/api/v1/process"
