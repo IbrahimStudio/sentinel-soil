@@ -139,3 +139,27 @@ def run_one_job(payload: Dict[str, Any], *, config_path: str = "configs/dev.yaml
             content_type="application/json",
         )
         return manifest
+
+
+def main() -> None:
+    import argparse
+    import json
+    import sys
+
+    parser = argparse.ArgumentParser(description="Scaleway soil-sentinel job worker")
+    parser.add_argument("--payload", required=True, help="Path to payload JSON file")
+    parser.add_argument("--config", default="configs/dev.yaml", help="Config path")
+    args = parser.parse_args()
+
+    with open(args.payload, "r", encoding="utf-8") as f:
+        payload = json.load(f)
+
+    manifest = run_one_job(payload, config_path=args.config)
+    print(json.dumps(manifest, indent=2))
+
+    if manifest.get("status") != "SUCCESS":
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
