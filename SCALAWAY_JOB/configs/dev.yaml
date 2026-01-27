@@ -1,7 +1,7 @@
 cdse:
   auth_url: "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
-  client_id: sh-15574bf9-2364-44da-9791-9a181d0ce9b6
-  client_secret: N0XLtfcExXuYgeRnPaSfOf91Pi719wRo
+  client_id: ""
+  client_secret: ""
 
 sentinelhub:
   process_url: "https://sh.dataspace.copernicus.eu/api/v1/process"
@@ -32,6 +32,7 @@ sentinel2:
     - B08
     - B11
     - B12
+    - VALID
 
 batch:
   name: lucas_sentinel_bs
@@ -43,11 +44,11 @@ batch:
   size: [10, 10]          # width, height in pixels
 
   # time
-  start_date: "2024-06-01"
-  end_date: "2024-06-30"
+  # start_date: "2024-06-01"
+  # end_date: "2024-06-30"
 
   # bands
-  bands: ["B02","B03","B04","B08","B11","B12"]
+  bands: ["B02","B03","B04","B08","B11","B12", "VALID"]
 
   # filtering / aggregation
   ndvi_threshold: 0.2

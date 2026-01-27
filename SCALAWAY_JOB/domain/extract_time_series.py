@@ -13,7 +13,7 @@ import rasterio
 
 from utils.config import load_config
 from utils.sentinelhub_client import SentinelHubClient, SentinelHubCredentials
-from utils.evalscript_builder import build_orbit_timeseries_evalscript
+from utils.evalscript_builder import build_orbit_timeseries_evalscript, build_orbit_timeseries_evalscript_filtered
 from utils.geometry import bbox_for_grid_around_point  # must accept width/height px + res_m
 
 import logging
@@ -189,7 +189,7 @@ def extract_one(
     )
     sh = SentinelHubClient(creds)
 
-    evalscript = build_orbit_timeseries_evalscript(bands=bands, units="REFLECTANCE")
+    evalscript = build_orbit_timeseries_evalscript_filtered(bands=bands, units="REFLECTANCE")
 
     logger.info(
         f"Extracting time series: id_part={id_part} size={pixel_window_w}x{pixel_window_h} "
@@ -240,3 +240,4 @@ def extract_one(
         f"Extraction complete: ts_root={ts_root} dates={len(dates)} per_date_dir={per_date_dir}"
     )
     return ts_root
+

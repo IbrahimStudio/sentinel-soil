@@ -47,6 +47,7 @@ configs/*
 # If using .env files for credentials
 .env
 .env.*
+*vm.env
 
 # -----------------------
 # Raster Data

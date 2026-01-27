@@ -192,6 +192,11 @@ def compute_baresoil_features_from_ts_root(
     # long format table
     ts_df = _stack_to_long_dataframe(stack, dates, bands, transform)
 
+    # If evalscript already masked invalid acquisitions, they come as NaNs.
+    # Drop them before computing indices.
+    base_bands = ["B02", "B03", "B04", "B08"]
+    ts_df = ts_df.dropna(subset=base_bands, how="any").copy()
+
     # indices (vectorized over dataframe columns)
     nir = ts_df["B08"].astype(np.float32).to_numpy()
     red = ts_df["B04"].astype(np.float32).to_numpy()
