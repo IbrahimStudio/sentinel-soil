@@ -52,7 +52,7 @@ def parse_job(payload: Dict[str, Any]) -> JobSpec:
         raise ValueError(f"Missing required keys: {missing}")
 
     sw = payload["spatial_window"]
-    if not isinstance(sw, dict) or sw.get("type") != "pixel_window":
+    if not isinstance(sw, dict) and not isinstance(sw, PixelWindow):
         raise ValueError("spatial_window must be {'type':'pixel_window','w':int,'h':int}")
 
     w = _to_int(sw.get("w"))

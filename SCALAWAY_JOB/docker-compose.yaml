@@ -1,0 +1,29 @@
+services:
+  worker:
+    image: rg.fr-par.scw.cloud/soil-sentinel/worker:2026-01-27
+    command: ["python", "-m", "pipeline.sqs_worker"]
+    restart: unless-stopped
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: fr-par
+      SQS_ENDPOINT: https://sqs.mnq.fr-par.scaleway.com
+      SQS_QUEUE_URL: ${SQS_QUEUE_URL}
+
+      # knobs
+      CONFIG_PATH: configs/dev.yaml
+      WINDOW_DAYS: "15"
+      WINDOW_W: "3"
+      WINDOW_H: "3"
+      RES_M: "10"
+      NDVI_THRESHOLD: "0.2"
+      MIN_OBS: "2"
+      SQS_VISIBILITY: "900"
+      SQS_WAIT_TIME: "20"
+
+      # Object storage vars etc (whatever storage_from_env expects)
+      SCALEWAY_S3_ENDPOINT: ${SCALEWAY_S3_ENDPOINT}
+      SCALEWAY_S3_REGION: ${SCALEWAY_S3_REGION}
+      SCALEWAY_S3_BUCKET: ${SCALEWAY_S3_BUCKET}
+      SCALEWAY_ACCESS_KEY: ${SCALEWAY_ACCESS_KEY}
+      SCALEWAY_SECRET_KEY: ${SCALEWAY_SECRET_KEY}

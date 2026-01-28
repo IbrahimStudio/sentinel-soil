@@ -5,6 +5,7 @@ import shutil
 import traceback
 from pathlib import Path
 from typing import Any, Dict
+import os
 
 from pipeline.models import parse_job
 from pipeline.paths import build_job_paths
@@ -139,6 +140,35 @@ def run_one_job(payload: Dict[str, Any], *, config_path: str = "configs/dev.yaml
             content_type="application/json",
         )
         return manifest
+    finally:
+        # Always attempt cleanup of bulky local artifacts
+        keep = os.getenv("KEEP_LOCAL_ARTIFACTS", "0") == "1"
+        keep_on_fail = os.getenv("KEEP_LOCAL_ON_FAIL", "1") == "1"
+
+        # If job failed and you want to keep local artifacts, skip cleanup
+        failed = False
+        try:
+            # you can detect failure based on manifest if you prefer;
+            # simplest is to set failed=True in the except block
+            pass
+        except Exception:
+            pass
+
+        if keep:
+            logger.info("KEEP_LOCAL_ARTIFACTS=1 -> skipping cleanup")
+            return
+
+        if failed and keep_on_fail:
+            logger.info("Job failed and KEEP_LOCAL_ON_FAIL=1 -> skipping cleanup")
+            return
+
+        for sub in [paths.local_intermediate_root, paths.local_features_root]:
+            try:
+                if sub.exists():
+                    shutil.rmtree(sub, ignore_errors=True)
+                    logger.info(f"Cleaned local dir: {sub}")
+            except Exception:
+                logger.exception(f"Failed cleaning local dir: {sub}")
 
 
 def main() -> None:

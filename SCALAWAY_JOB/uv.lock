@@ -1763,6 +1763,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "boto3" },
+    { name = "botocore" },
     { name = "cdsapi" },
     { name = "dotenv" },
     { name = "netcdf4" },
@@ -1781,6 +1782,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "boto3", specifier = ">=1.42.30" },
+    { name = "botocore", specifier = ">=1.42.30" },
     { name = "cdsapi", specifier = ">=0.7.7" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "netcdf4", specifier = ">=1.7.4" },
