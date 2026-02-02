@@ -16,8 +16,8 @@ from pipeline.worker import run_one_job  # adjust if your module path differs
 # ----------------- EDIT THESE (debug-friendly) -----------------
 XLSX_PATH = "gabri_filters.xlsx"
 SHEET_NAME = 0               # or "Sheet1"
-LIMIT: Optional[int] = None  # set 5 for a quick test
-N_WORKERS = 3                # set 1 for easiest debugging
+LIMIT: Optional[int] = 1  # set 5 for a quick test
+N_WORKERS = 1               # set 1 for easiest debugging
 
 CONFIG_PATH = "configs/dev.yaml"
 
