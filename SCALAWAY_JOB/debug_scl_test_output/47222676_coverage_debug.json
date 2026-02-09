@@ -1,0 +1,829 @@
+{
+  "total_intervals": 6,
+  "intervals_with_data": 6,
+  "intervals_analyzed": [
+    {
+      "interval": "2018-03-27T00:00:00Z to 2018-03-28T00:00:00Z",
+      "data_mask_coverage": 0.0,
+      "sample_count": 0,
+      "no_data_count": 0,
+      "band_stats": {
+        "B0": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.07559999823570251
+        },
+        "B1": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.0925000011920929
+        },
+        "B2": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.09269999712705612
+        },
+        "B3": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.26109999418258667
+        },
+        "B4": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.2102999985218048
+        },
+        "B5": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.13490000367164612
+        },
+        "B6": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.47340890765190125
+        },
+        "B7": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": -0.48170366883277893
+        },
+        "B8": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": -0.38766083121299744
+        },
+        "B9": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.11428571492433548
+        },
+        "B10": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": -0.05925925821065903
+        },
+        "B11": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.14501667022705078
+        },
+        "B12": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.14501667022705078
+        },
+        "B13": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.09269999712705612
+        },
+        "B14": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.2102999985218048
+        },
+        "B15": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.13490000367164612
+        },
+        "B16": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.44270089268684387
+        },
+        "B17": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 1.5449316501617432
+        }
+      },
+      "has_valid_data": true
+    },
+    {
+      "interval": "2018-04-01T00:00:00Z to 2018-04-02T00:00:00Z",
+      "data_mask_coverage": 0.0,
+      "sample_count": 0,
+      "no_data_count": 0,
+      "band_stats": {
+        "B0": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B1": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B2": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B3": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B4": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B5": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B6": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B7": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B8": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B9": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B10": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B11": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B12": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B13": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B14": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B15": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B16": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B17": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        }
+      },
+      "has_valid_data": true
+    },
+    {
+      "interval": "2018-04-06T00:00:00Z to 2018-04-07T00:00:00Z",
+      "data_mask_coverage": 0.0,
+      "sample_count": 0,
+      "no_data_count": 0,
+      "band_stats": {
+        "B0": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.027799999341368675
+        },
+        "B1": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.0502999983727932
+        },
+        "B2": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.04600000008940697
+        },
+        "B3": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.26179999113082886
+        },
+        "B4": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.20250000059604645
+        },
+        "B5": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.11540000140666962
+        },
+        "B6": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.6972873210906982
+        },
+        "B7": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": -0.6759020686149597
+        },
+        "B8": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": -0.5982208847999573
+        },
+        "B9": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.14358215034008026
+        },
+        "B10": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": -0.08966824412345886
+        },
+        "B11": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.11505000293254852
+        },
+        "B12": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.11505000293254852
+        },
+        "B13": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.04600000008940697
+        },
+        "B14": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.20250000059604645
+        },
+        "B15": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.11540000140666962
+        },
+        "B16": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.22773654758930206
+        },
+        "B17": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 1.7359098196029663
+        }
+      },
+      "has_valid_data": true
+    },
+    {
+      "interval": "2018-04-11T00:00:00Z to 2018-04-12T00:00:00Z",
+      "data_mask_coverage": 0.0,
+      "sample_count": 0,
+      "no_data_count": 0,
+      "band_stats": {
+        "B0": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.05719999969005585
+        },
+        "B1": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.08449999988079071
+        },
+        "B2": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.07959999889135361
+        },
+        "B3": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.29010000824928284
+        },
+        "B4": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.2321999967098236
+        },
+        "B5": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.14489999413490295
+        },
+        "B6": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.5693805813789368
+        },
+        "B7": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": -0.5442613959312439
+        },
+        "B8": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": -0.4542326331138611
+        },
+        "B9": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.11995451897382736
+        },
+        "B10": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": -0.06258167326450348
+        },
+        "B11": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.14786666631698608
+        },
+        "B12": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.14786666631698608
+        },
+        "B13": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.07959999889135361
+        },
+        "B14": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.2321999967098236
+        },
+        "B15": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.14489999413490295
+        },
+        "B16": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.3521060049533844
+        },
+        "B17": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 1.598703145980835
+        }
+      },
+      "has_valid_data": true
+    },
+    {
+      "interval": "2018-04-16T00:00:00Z to 2018-04-17T00:00:00Z",
+      "data_mask_coverage": 0.0,
+      "sample_count": 0,
+      "no_data_count": 0,
+      "band_stats": {
+        "B0": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B1": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B2": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B3": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B4": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B5": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B6": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B7": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B8": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B9": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B10": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B11": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B12": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B13": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B14": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B15": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B16": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        },
+        "B17": {
+          "sample_count": 9,
+          "no_data_count": 9,
+          "total_pixels": 18,
+          "coverage": 0.5,
+          "p50_value": "NaN"
+        }
+      },
+      "has_valid_data": true
+    },
+    {
+      "interval": "2018-04-21T00:00:00Z to 2018-04-22T00:00:00Z",
+      "data_mask_coverage": 0.0,
+      "sample_count": 0,
+      "no_data_count": 0,
+      "band_stats": {
+        "B0": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.02969999983906746
+        },
+        "B1": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.051899999380111694
+        },
+        "B2": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.032600000500679016
+        },
+        "B3": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.30559998750686646
+        },
+        "B4": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.17080000042915344
+        },
+        "B5": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.0851999968290329
+        },
+        "B6": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.801245927810669
+        },
+        "B7": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": -0.709563136100769
+        },
+        "B8": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": -0.5338208675384521
+        },
+        "B9": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.28016528487205505
+        },
+        "B10": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": -0.2434125691652298
+        },
+        "B11": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.11264999955892563
+        },
+        "B12": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.11264999955892563
+        },
+        "B13": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.032600000500679016
+        },
+        "B14": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.17080000042915344
+        },
+        "B15": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.0851999968290329
+        },
+        "B16": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 0.19058553874492645
+        },
+        "B17": {
+          "sample_count": 9,
+          "no_data_count": 0,
+          "total_pixels": 9,
+          "coverage": 1.0,
+          "p50_value": 1.9893112182617188
+        }
+      },
+      "has_valid_data": true
+    }
+  ],
+  "overall_stats": {
+    "total_pixels": 0,
+    "valid_pixels": 0,
+    "coverage_distribution": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "overall_coverage": 0.0
+  }
+}

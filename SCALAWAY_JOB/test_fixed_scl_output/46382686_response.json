@@ -1,0 +1,3203 @@
+{
+  "data": [
+    {
+      "interval": {
+        "from": "2018-06-08T00:00:00Z",
+        "to": "2018-06-09T00:00:00Z"
+      },
+      "outputs": {
+        "features": {
+          "bands": {
+            "B0": {
+              "stats": {
+                "min": 0.04580000042915344,
+                "max": 0.05350000038743019,
+                "mean": 0.049755556301938154,
+                "stDev": 0.003558124327942597,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.05220000073313713
+                }
+              }
+            },
+            "B1": {
+              "stats": {
+                "min": 0.07720000296831131,
+                "max": 0.08640000224113464,
+                "mean": 0.08093333409892188,
+                "stDev": 0.003487754718108899,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.08269999921321869
+                }
+              }
+            },
+            "B2": {
+              "stats": {
+                "min": 0.05900000035762787,
+                "max": 0.07159999758005142,
+                "mean": 0.06513333403401905,
+                "stDev": 0.005588877810161529,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.06840000301599503
+                }
+              }
+            },
+            "B3": {
+              "stats": {
+                "min": 0.24899999797344208,
+                "max": 0.30880001187324524,
+                "mean": 0.29126667314105564,
+                "stDev": 0.02448220023749157,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.305400013923645
+                }
+              }
+            },
+            "B4": {
+              "stats": {
+                "min": 0.17589999735355377,
+                "max": 0.18549999594688416,
+                "mean": 0.1790999968846639,
+                "stDev": 0.004525482736483488,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.17589999735355377
+                }
+              }
+            },
+            "B5": {
+              "stats": {
+                "min": 0.1023000031709671,
+                "max": 0.13199999928474426,
+                "mean": 0.1122000018755595,
+                "stDev": 0.014000712435510626,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.1023000031709671
+                }
+              }
+            },
+            "B6": {
+              "stats": {
+                "min": 0.5689980983734131,
+                "max": 0.679173469543457,
+                "mean": 0.6323439810011122,
+                "stDev": 0.04522644452228218,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.6201591491699219
+                }
+              }
+            },
+            "B7": {
+              "stats": {
+                "min": -0.6000000238418579,
+                "max": -0.5013566613197327,
+                "mean": -0.5628518992000155,
+                "stDev": 0.04026281522057904,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.5689699649810791
+                }
+              }
+            },
+            "B8": {
+              "stats": {
+                "min": -0.38996443152427673,
+                "max": -0.3604021668434143,
+                "mean": -0.3777114517158932,
+                "stDev": 0.012363510292981036,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.37713438272476196
+                }
+              }
+            },
+            "B9": {
+              "stats": {
+                "min": 0.17204047739505768,
+                "max": 0.274190217256546,
+                "mean": 0.23642926083670723,
+                "stDev": 0.041571689002062845,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.2442452609539032
+                }
+              }
+            },
+            "B10": {
+              "stats": {
+                "min": -0.20305342972278595,
+                "max": -0.1051282063126564,
+                "mean": -0.16436107125547195,
+                "stDev": 0.04008153162721367,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.1652597337961197
+                }
+              }
+            },
+            "B11": {
+              "stats": {
+                "min": 0.12183333188295364,
+                "max": 0.13865000009536743,
+                "mean": 0.12973147796259987,
+                "stDev": 0.005882478654418178,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.12816666066646576
+                }
+              }
+            },
+            "B12": {
+              "stats": {
+                "min": 0.12183333188295364,
+                "max": 0.13865000009536743,
+                "mean": 0.12973147796259987,
+                "stDev": 0.005882478654418178,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.12816666066646576
+                }
+              }
+            },
+            "B13": {
+              "stats": {
+                "min": 0.05900000035762787,
+                "max": 0.07159999758005142,
+                "mean": 0.06513333403401905,
+                "stDev": 0.005588877810161529,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.06840000301599503
+                }
+              }
+            },
+            "B14": {
+              "stats": {
+                "min": 0.17589999735355377,
+                "max": 0.18549999594688416,
+                "mean": 0.1790999968846639,
+                "stDev": 0.004525482736483488,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.17589999735355377
+                }
+              }
+            },
+            "B15": {
+              "stats": {
+                "min": 0.1023000031709671,
+                "max": 0.13199999928474426,
+                "mean": 0.1122000018755595,
+                "stDev": 0.014000712435510626,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.1023000031709671
+                }
+              }
+            },
+            "B16": {
+              "stats": {
+                "min": 0.33541783690452576,
+                "max": 0.38885730504989624,
+                "mean": 0.36331002910931903,
+                "stDev": 0.025109185969781535,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.3784366548061371
+                }
+              }
+            },
+            "B17": {
+              "stats": {
+                "min": 1.4053030014038086,
+                "max": 1.7194526195526123,
+                "mean": 1.6147360801696777,
+                "stDev": 0.14809155020012238,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 1.7194526195526123
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "interval": {
+        "from": "2018-06-10T00:00:00Z",
+        "to": "2018-06-11T00:00:00Z"
+      },
+      "outputs": {
+        "features": {
+          "bands": {
+            "B0": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B1": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B2": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B3": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B4": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B5": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B6": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B7": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B8": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B9": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B10": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B11": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B12": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B13": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B14": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B15": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B16": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B17": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "interval": {
+        "from": "2018-06-13T00:00:00Z",
+        "to": "2018-06-14T00:00:00Z"
+      },
+      "outputs": {
+        "features": {
+          "bands": {
+            "B0": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B1": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B2": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B3": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B4": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B5": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B6": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B7": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B8": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B9": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B10": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B11": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B12": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B13": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B14": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B15": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B16": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B17": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "interval": {
+        "from": "2018-06-15T00:00:00Z",
+        "to": "2018-06-16T00:00:00Z"
+      },
+      "outputs": {
+        "features": {
+          "bands": {
+            "B0": {
+              "stats": {
+                "min": 0.061900001019239426,
+                "max": 0.06689999997615814,
+                "mean": 0.064588889065716,
+                "stDev": 0.0017495675019195155,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.06340000033378601
+                }
+              }
+            },
+            "B1": {
+              "stats": {
+                "min": 0.09629999846220016,
+                "max": 0.09950000047683716,
+                "mean": 0.09807777818706302,
+                "stDev": 0.0011409336051824066,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.09730000048875809
+                }
+              }
+            },
+            "B2": {
+              "stats": {
+                "min": 0.08030000329017639,
+                "max": 0.08879999816417694,
+                "mean": 0.08271111216810015,
+                "stDev": 0.003400143432847504,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.08100000023841858
+                }
+              }
+            },
+            "B3": {
+              "stats": {
+                "min": 0.30640000104904175,
+                "max": 0.3343999981880188,
+                "mean": 0.325944443543752,
+                "stDev": 0.011427852273485823,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.3321000039577484
+                }
+              }
+            },
+            "B4": {
+              "stats": {
+                "min": 0.17820000648498535,
+                "max": 0.18400000035762787,
+                "mean": 0.182066669066747,
+                "stDev": 0.0027341433321239686,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.18400000035762787
+                }
+              }
+            },
+            "B5": {
+              "stats": {
+                "min": 0.10369999706745148,
+                "max": 0.10700000077486038,
+                "mean": 0.10479999830325443,
+                "stDev": 0.001555636666299721,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.10369999706745148
+                }
+              }
+            },
+            "B6": {
+              "stats": {
+                "min": 0.5506072640419006,
+                "max": 0.6127321124076843,
+                "mean": 0.5947139528062608,
+                "stDev": 0.025025622122459956,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.6078431606292725
+                }
+              }
+            },
+            "B7": {
+              "stats": {
+                "min": -0.5492240190505981,
+                "max": -0.5097314715385437,
+                "mean": -0.5370212462213304,
+                "stDev": 0.015304641582144557,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.5403525233268738
+                }
+              }
+            },
+            "B8": {
+              "stats": {
+                "min": -0.3082118630409241,
+                "max": -0.28525063395500183,
+                "mean": -0.29975881179173786,
+                "stDev": 0.008910154906397004,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.2983606457710266
+                }
+              }
+            },
+            "B9": {
+              "stats": {
+                "min": 0.24959217011928558,
+                "max": 0.30158731341362,
+                "mean": 0.28287716375456917,
+                "stDev": 0.018636831672576036,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.29012346267700195
+                }
+              }
+            },
+            "B10": {
+              "stats": {
+                "min": -0.21239744126796722,
+                "max": -0.1543707400560379,
+                "mean": -0.19169402619202935,
+                "stDev": 0.02129337623580475,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.20163117349147797
+                }
+              }
+            },
+            "B11": {
+              "stats": {
+                "min": 0.14098332822322845,
+                "max": 0.1440500020980835,
+                "mean": 0.1430314795838462,
+                "stDev": 0.0012593244080561655,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.14384999871253967
+                }
+              }
+            },
+            "B12": {
+              "stats": {
+                "min": 0.14098332822322845,
+                "max": 0.1440500020980835,
+                "mean": 0.1430314795838462,
+                "stDev": 0.0012593244080561655,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.14384999871253967
+                }
+              }
+            },
+            "B13": {
+              "stats": {
+                "min": 0.08030000329017639,
+                "max": 0.08879999816417694,
+                "mean": 0.08271111216810015,
+                "stDev": 0.003400143432847504,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.08100000023841858
+                }
+              }
+            },
+            "B14": {
+              "stats": {
+                "min": 0.17820000648498535,
+                "max": 0.18400000035762787,
+                "mean": 0.182066669066747,
+                "stDev": 0.0027341433321239686,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.18400000035762787
+                }
+              }
+            },
+            "B15": {
+              "stats": {
+                "min": 0.10369999706745148,
+                "max": 0.10700000077486038,
+                "mean": 0.10479999830325443,
+                "stDev": 0.001555636666299721,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.10369999706745148
+                }
+              }
+            },
+            "B16": {
+              "stats": {
+                "min": 0.436413049697876,
+                "max": 0.48260870575904846,
+                "mean": 0.45434403750631547,
+                "stDev": 0.01856741877552726,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.4545454680919647
+                }
+              }
+            },
+            "B17": {
+              "stats": {
+                "min": 1.6654205322265625,
+                "max": 1.7743490934371948,
+                "mean": 1.7380395730336509,
+                "stDev": 0.05134941619795467,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 1.7743490934371948
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "interval": {
+        "from": "2018-06-18T00:00:00Z",
+        "to": "2018-06-19T00:00:00Z"
+      },
+      "outputs": {
+        "features": {
+          "bands": {
+            "B0": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B1": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B2": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B3": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B4": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B5": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B6": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B7": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B8": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B9": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B10": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B11": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B12": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B13": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B14": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B15": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B16": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B17": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "interval": {
+        "from": "2018-06-20T00:00:00Z",
+        "to": "2018-06-21T00:00:00Z"
+      },
+      "outputs": {
+        "features": {
+          "bands": {
+            "B0": {
+              "stats": {
+                "min": 0.025499999523162842,
+                "max": 0.03359999880194664,
+                "mean": 0.02908888831734657,
+                "stDev": 0.003419371013109467,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.03009999915957451
+                }
+              }
+            },
+            "B1": {
+              "stats": {
+                "min": 0.04910000041127205,
+                "max": 0.05959999933838844,
+                "mean": 0.05339999952250057,
+                "stDev": 0.004349712077717782,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.053599998354911804
+                }
+              }
+            },
+            "B2": {
+              "stats": {
+                "min": 0.025499999523162842,
+                "max": 0.04100000113248825,
+                "mean": 0.03308888938691881,
+                "stDev": 0.006885806569223638,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.037300001829862595
+                }
+              }
+            },
+            "B3": {
+              "stats": {
+                "min": 0.24140000343322754,
+                "max": 0.30160000920295715,
+                "mean": 0.28280000554190743,
+                "stDev": 0.024705735339964733,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.2955999970436096
+                }
+              }
+            },
+            "B4": {
+              "stats": {
+                "min": 0.13779999315738678,
+                "max": 0.14110000431537628,
+                "mean": 0.14000000059604645,
+                "stDev": 0.0015556401785370984,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.14110000431537628
+                }
+              }
+            },
+            "B5": {
+              "stats": {
+                "min": 0.0714000016450882,
+                "max": 0.0869000032544136,
+                "mean": 0.07656666884819667,
+                "stDev": 0.007306770830904264,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.0714000016450882
+                }
+              }
+            },
+            "B6": {
+              "stats": {
+                "min": 0.7150976657867432,
+                "max": 0.8440843820571899,
+                "mean": 0.7878001266055636,
+                "stDev": 0.05442231677098412,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.7759087085723877
+                }
+              }
+            },
+            "B7": {
+              "stats": {
+                "min": -0.7199885845184326,
+                "max": -0.6366101503372192,
+                "mean": -0.6804072194629245,
+                "stDev": 0.03669070939007749,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.6644144058227539
+                }
+              }
+            },
+            "B8": {
+              "stats": {
+                "min": -0.4837013781070709,
+                "max": -0.39614996314048767,
+                "mean": -0.44832467370563084,
+                "stDev": 0.036513908541223376,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.4494093358516693
+                }
+              }
+            },
+            "B9": {
+              "stats": {
+                "min": 0.2622222304344177,
+                "max": 0.36409783363342285,
+                "mean": 0.3353646298249562,
+                "stDev": 0.04177075803063751,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.36254799365997314
+                }
+              }
+            },
+            "B10": {
+              "stats": {
+                "min": -0.3250962197780609,
+                "max": -0.19946984946727753,
+                "mean": -0.2843564732207192,
+                "stDev": 0.05079278127157111,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.3055720925331116
+                }
+              }
+            },
+            "B11": {
+              "stats": {
+                "min": 0.09628333151340485,
+                "max": 0.10846666991710663,
+                "mean": 0.10249073968993291,
+                "stDev": 0.0040752515556942434,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.10236666351556778
+                }
+              }
+            },
+            "B12": {
+              "stats": {
+                "min": 0.09628333151340485,
+                "max": 0.10846666991710663,
+                "mean": 0.10249073968993291,
+                "stDev": 0.0040752515556942434,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.10236666351556778
+                }
+              }
+            },
+            "B13": {
+              "stats": {
+                "min": 0.025499999523162842,
+                "max": 0.04100000113248825,
+                "mean": 0.03308888938691881,
+                "stDev": 0.006885806569223638,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.037300001829862595
+                }
+              }
+            },
+            "B14": {
+              "stats": {
+                "min": 0.13779999315738678,
+                "max": 0.14110000431537628,
+                "mean": 0.14000000059604645,
+                "stDev": 0.0015556401785370984,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.14110000431537628
+                }
+              }
+            },
+            "B15": {
+              "stats": {
+                "min": 0.0714000016450882,
+                "max": 0.0869000032544136,
+                "mean": 0.07656666884819667,
+                "stDev": 0.007306770830904264,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.0714000016450882
+                }
+              }
+            },
+            "B16": {
+              "stats": {
+                "min": 0.1807228922843933,
+                "max": 0.2975326478481293,
+                "mean": 0.23668663700421652,
+                "stDev": 0.0506135621501278,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.270682156085968
+                }
+              }
+            },
+            "B17": {
+              "stats": {
+                "min": 1.5857306718826294,
+                "max": 1.976190447807312,
+                "mean": 1.8460371891657512,
+                "stDev": 0.18406450355794862,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 1.976190447807312
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "interval": {
+        "from": "2018-06-23T00:00:00Z",
+        "to": "2018-06-24T00:00:00Z"
+      },
+      "outputs": {
+        "features": {
+          "bands": {
+            "B0": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B1": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B2": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B3": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B4": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B5": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B6": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B7": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B8": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B9": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B10": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B11": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B12": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B13": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B14": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B15": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B16": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B17": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "interval": {
+        "from": "2018-06-25T00:00:00Z",
+        "to": "2018-06-26T00:00:00Z"
+      },
+      "outputs": {
+        "features": {
+          "bands": {
+            "B0": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B1": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B2": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B3": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B4": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B5": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B6": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B7": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B8": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B9": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B10": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B11": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B12": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B13": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B14": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B15": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B16": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B17": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "interval": {
+        "from": "2018-06-28T00:00:00Z",
+        "to": "2018-06-29T00:00:00Z"
+      },
+      "outputs": {
+        "features": {
+          "bands": {
+            "B0": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B1": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B2": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B3": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B4": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B5": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B6": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B7": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B8": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B9": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B10": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B11": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B12": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B13": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B14": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B15": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B16": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B17": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "interval": {
+        "from": "2018-06-30T00:00:00Z",
+        "to": "2018-07-01T00:00:00Z"
+      },
+      "outputs": {
+        "features": {
+          "bands": {
+            "B0": {
+              "stats": {
+                "min": 0.046799998730421066,
+                "max": 0.06030000001192093,
+                "mean": 0.053166665964656405,
+                "stDev": 0.005875940096883765,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.05590000003576279
+                }
+              }
+            },
+            "B1": {
+              "stats": {
+                "min": 0.07580000162124634,
+                "max": 0.09179999679327011,
+                "mean": 0.08352222210831112,
+                "stDev": 0.007092212827766903,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.08709999918937683
+                }
+              }
+            },
+            "B2": {
+              "stats": {
+                "min": 0.045899998396635056,
+                "max": 0.07050000131130219,
+                "mean": 0.056999999615881175,
+                "stDev": 0.010373043013806576,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.061500001698732376
+                }
+              }
+            },
+            "B3": {
+              "stats": {
+                "min": 0.33379998803138733,
+                "max": 0.42559999227523804,
+                "mean": 0.3959999945428636,
+                "stDev": 0.04057399273427373,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.42399999499320984
+                }
+              }
+            },
+            "B4": {
+              "stats": {
+                "min": 0.2198999971151352,
+                "max": 0.23909999430179596,
+                "mean": 0.22629999617735544,
+                "stDev": 0.009050965472966974,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.2198999971151352
+                }
+              }
+            },
+            "B5": {
+              "stats": {
+                "min": 0.11779999732971191,
+                "max": 0.1648000031709671,
+                "mean": 0.13346666594346365,
+                "stDev": 0.022156015230772593,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.11779999732971191
+                }
+              }
+            },
+            "B6": {
+              "stats": {
+                "min": 0.6512490510940552,
+                "max": 0.8046392798423767,
+                "mean": 0.7445045113563538,
+                "stDev": 0.06278217296950624,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.7474851012229919
+                }
+              }
+            },
+            "B7": {
+              "stats": {
+                "min": -0.6966786980628967,
+                "max": -0.5861249566078186,
+                "mean": -0.6485439870092604,
+                "stDev": 0.04806616743262714,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.6451488137245178
+                }
+              }
+            },
+            "B8": {
+              "stats": {
+                "min": -0.487318217754364,
+                "max": -0.4325732886791229,
+                "mean": -0.46163203650050694,
+                "stDev": 0.023587410135001173,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.44996967911720276
+                }
+              }
+            },
+            "B9": {
+              "stats": {
+                "min": 0.18714942038059235,
+                "max": 0.3169746994972229,
+                "mean": 0.26973530153433484,
+                "stDev": 0.05183415568034038,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.280577689409256
+                }
+              }
+            },
+            "B10": {
+              "stats": {
+                "min": -0.2783057391643524,
+                "max": -0.14705882966518402,
+                "mean": -0.22490445938375261,
+                "stDev": 0.056354315733476504,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.23130033910274506
+                }
+              }
+            },
+            "B11": {
+              "stats": {
+                "min": 0.14811666309833527,
+                "max": 0.17311666905879974,
+                "mean": 0.15824259320894876,
+                "stDev": 0.008818560521915705,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.15503333508968353
+                }
+              }
+            },
+            "B12": {
+              "stats": {
+                "min": 0.14811666309833527,
+                "max": 0.17311666905879974,
+                "mean": 0.15824259320894876,
+                "stDev": 0.008818560521915705,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.15503333508968353
+                }
+              }
+            },
+            "B13": {
+              "stats": {
+                "min": 0.045899998396635056,
+                "max": 0.07050000131130219,
+                "mean": 0.056999999615881175,
+                "stDev": 0.010373043013806576,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.061500001698732376
+                }
+              }
+            },
+            "B14": {
+              "stats": {
+                "min": 0.2198999971151352,
+                "max": 0.23909999430179596,
+                "mean": 0.22629999617735544,
+                "stDev": 0.009050965472966974,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.2198999971151352
+                }
+              }
+            },
+            "B15": {
+              "stats": {
+                "min": 0.11779999732971191,
+                "max": 0.1648000031709671,
+                "mean": 0.13346666594346365,
+                "stDev": 0.022156015230772593,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.11779999732971191
+                }
+              }
+            },
+            "B16": {
+              "stats": {
+                "min": 0.20873123407363892,
+                "max": 0.3206002712249756,
+                "mean": 0.25156447622511124,
+                "stDev": 0.04399087165396726,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.2572145462036133
+                }
+              }
+            },
+            "B17": {
+              "stats": {
+                "min": 1.4508495330810547,
+                "max": 1.8667232990264893,
+                "mean": 1.728098710378011,
+                "stDev": 0.19604477334506926,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 1.8667232990264893
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "interval": {
+        "from": "2018-07-03T00:00:00Z",
+        "to": "2018-07-04T00:00:00Z"
+      },
+      "outputs": {
+        "features": {
+          "bands": {
+            "B0": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B1": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B2": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B3": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B4": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B5": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B6": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B7": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B8": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B9": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B10": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B11": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B12": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B13": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B14": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B15": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B16": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B17": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "interval": {
+        "from": "2018-07-05T00:00:00Z",
+        "to": "2018-07-06T00:00:00Z"
+      },
+      "outputs": {
+        "features": {
+          "bands": {
+            "B0": {
+              "stats": {
+                "min": 0.13819999992847443,
+                "max": 0.14059999585151672,
+                "mean": 0.13886666629049513,
+                "stDev": 0.0009977740506894705,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.13819999992847443
+                }
+              }
+            },
+            "B1": {
+              "stats": {
+                "min": 0.15559999644756317,
+                "max": 0.16099999845027924,
+                "mean": 0.15802221993605295,
+                "stDev": 0.002257717596459805,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.15919999778270721
+                }
+              }
+            },
+            "B2": {
+              "stats": {
+                "min": 0.12759999930858612,
+                "max": 0.1387999951839447,
+                "mean": 0.1322666671541002,
+                "stDev": 0.004388875227933137,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.1340000033378601
+                }
+              }
+            },
+            "B3": {
+              "stats": {
+                "min": 0.36399999260902405,
+                "max": 0.3903999924659729,
+                "mean": 0.37791110740767586,
+                "stDev": 0.011309820668833714,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.37040001153945923
+                }
+              }
+            },
+            "B4": {
+              "stats": {
+                "min": 0.21170000731945038,
+                "max": 0.21570000052452087,
+                "mean": 0.21303333838780725,
+                "stDev": 0.0018856148800036432,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.21170000731945038
+                }
+              }
+            },
+            "B5": {
+              "stats": {
+                "min": 0.13510000705718994,
+                "max": 0.14300000667572021,
+                "mean": 0.1377333402633667,
+                "stDev": 0.0037240955344225966,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.13510000705718994
+                }
+              }
+            },
+            "B6": {
+              "stats": {
+                "min": 0.44789180159568787,
+                "max": 0.507335901260376,
+                "mean": 0.4811685052182939,
+                "stDev": 0.02389665410204042,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.46549659967422485
+                }
+              }
+            },
+            "B7": {
+              "stats": {
+                "min": -0.43003663420677185,
+                "max": -0.39090561866760254,
+                "mean": -0.4099879993332757,
+                "stDev": 0.017973209724264482,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.39536648988723755
+                }
+              }
+            },
+            "B8": {
+              "stats": {
+                "min": -0.15273618698120117,
+                "max": -0.14154759049415588,
+                "mean": -0.14828333424197304,
+                "stDev": 0.0046216716950107425,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.15009330213069916
+                }
+              }
+            },
+            "B9": {
+              "stats": {
+                "min": 0.25582197308540344,
+                "max": 0.2967945635318756,
+                "mean": 0.2787363827228546,
+                "stDev": 0.0165385604334352,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.2688654661178589
+                }
+              }
+            },
+            "B10": {
+              "stats": {
+                "min": -0.21811269223690033,
+                "max": -0.17356334626674652,
+                "mean": -0.19881663554244572,
+                "stDev": 0.017871607962290148,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": -0.1901136189699173
+                }
+              }
+            },
+            "B11": {
+              "stats": {
+                "min": 0.1913333386182785,
+                "max": 0.19415000081062317,
+                "mean": 0.19297222627533805,
+                "stDev": 0.0009649716452148142,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.1931000053882599
+                }
+              }
+            },
+            "B12": {
+              "stats": {
+                "min": 0.1913333386182785,
+                "max": 0.19415000081062317,
+                "mean": 0.19297222627533805,
+                "stDev": 0.0009649716452148142,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.1931000053882599
+                }
+              }
+            },
+            "B13": {
+              "stats": {
+                "min": 0.12759999930858612,
+                "max": 0.1387999951839447,
+                "mean": 0.1322666671541002,
+                "stDev": 0.004388875227933137,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.1340000033378601
+                }
+              }
+            },
+            "B14": {
+              "stats": {
+                "min": 0.21170000731945038,
+                "max": 0.21570000052452087,
+                "mean": 0.21303333838780725,
+                "stDev": 0.0018856148800036432,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.21170000731945038
+                }
+              }
+            },
+            "B15": {
+              "stats": {
+                "min": 0.13510000705718994,
+                "max": 0.14300000667572021,
+                "mean": 0.1377333402633667,
+                "stDev": 0.0037240955344225966,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.13510000705718994
+                }
+              }
+            },
+            "B16": {
+              "stats": {
+                "min": 0.6027397513389587,
+                "max": 0.6434863209724426,
+                "mean": 0.6207735074890984,
+                "stDev": 0.016423140172778357,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 0.6329711675643921
+                }
+              }
+            },
+            "B17": {
+              "stats": {
+                "min": 1.5083916187286377,
+                "max": 1.56698739528656,
+                "mean": 1.5474554697672527,
+                "stDev": 0.027622313968665758,
+                "sampleCount": 9,
+                "noDataCount": 0,
+                "percentiles": {
+                  "50.0": 1.56698739528656
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "interval": {
+        "from": "2018-07-08T00:00:00Z",
+        "to": "2018-07-09T00:00:00Z"
+      },
+      "outputs": {
+        "features": {
+          "bands": {
+            "B0": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B1": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B2": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B3": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B4": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B5": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B6": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B7": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B8": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B9": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B10": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B11": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B12": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B13": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B14": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B15": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B16": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            },
+            "B17": {
+              "stats": {
+                "min": "NaN",
+                "max": "NaN",
+                "mean": "NaN",
+                "stDev": "NaN",
+                "sampleCount": 9,
+                "noDataCount": 9,
+                "percentiles": {
+                  "50.0": "NaN"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "status": "OK"
+}

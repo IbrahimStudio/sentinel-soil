@@ -38,9 +38,9 @@ batch:
   seeds_csv: data\seed_data\lucas_2015_seed.xlsx
 
   # AOI / spatial
-  window_m: 100.0
+  window_m: 30.0
   dst_epsg: 32632
-  size: [10, 10]          # width, height in pixels
+  size: [3, 3]          # width, height in pixels
 
   # time
   start_date: "2024-06-01"

@@ -1,0 +1,39 @@
+{
+  "lat": 46.7536063,
+  "lon": 14.25227846,
+  "bbox_epsg4326": [
+    14.252081788899282,
+    46.753471553323756,
+    14.252475131100717,
+    46.75374104667625
+  ],
+  "query_start_date": "2018-05-02",
+  "query_end_date": "2018-06-01",
+  "aggregation_interval": "P1D",
+  "coverage_threshold": 0.8,
+  "n_days_total": 6,
+  "n_days_kept": 0,
+  "kept_ratio": 0.0,
+  "coverage_median_kept": null,
+  "coverage_min_kept": null,
+  "p50_aggregated": {
+    "B02": null,
+    "B03": null,
+    "B04": null,
+    "B08": null,
+    "B11": null,
+    "B12": null,
+    "NDVI": null,
+    "NDWI": null,
+    "MNDWI": null,
+    "NDMI": null,
+    "BSI": null,
+    "BRIGHT": null,
+    "ALBEDO_PROXY": null,
+    "RED": null,
+    "SWIR1": null,
+    "SWIR2": null,
+    "RED_SWIR1_RATIO": null,
+    "SWIR1_SWIR2_RATIO": null
+  }
+}

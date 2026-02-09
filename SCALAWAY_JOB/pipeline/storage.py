@@ -180,6 +180,63 @@ class S3StorageClient(StorageClient):
         )
         self.log.info(f"Put object: s3://{self.bucket}/{key}")
 
+    def list_objects(self, prefix: str) -> list[str]:
+        """
+        List objects in S3 bucket with given prefix
+
+        Args:
+            prefix: S3 prefix to filter objects
+
+        Returns:
+            List of object keys
+        """
+        prefix = _norm_key(prefix)
+        self.log.info(f"Listing objects with prefix: s3://{self.bucket}/{prefix}")
+
+        try:
+            paginator = self.s3.get_paginator('list_objects_v2')
+            page_iterator = paginator.paginate(
+                Bucket=self.bucket,
+                Prefix=prefix
+            )
+
+            objects = []
+            for page in page_iterator:
+                if 'Contents' in page:
+                    for obj in page['Contents']:
+                        objects.append(obj['Key'])
+
+            self.log.info(f"Found {len(objects)} objects with prefix: {prefix}")
+            return objects
+
+        except Exception as e:
+            self.log.error(f"Failed to list objects: {e}")
+            raise
+
+    def get_text(self, key: str) -> str:
+        """
+        Get text content of an S3 object
+
+        Args:
+            key: S3 object key
+
+        Returns:
+            Text content of the object
+        """
+        key = _norm_key(key)
+        self.log.info(f"Getting text content: s3://{self.bucket}/{key}")
+
+        try:
+            response = self.s3.get_object(
+                Bucket=self.bucket,
+                Key=key
+            )
+            return response['Body'].read().decode('utf-8')
+
+        except Exception as e:
+            self.log.error(f"Failed to get object {key}: {e}")
+            raise
+
 
 def storage_from_env(*, logger: Optional[logging.Logger] = None) -> S3StorageClient:
     """

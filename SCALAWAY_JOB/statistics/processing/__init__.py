@@ -1,1 +1,0 @@
-# Data processing for statistics API responses
