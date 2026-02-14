@@ -1,0 +1,50 @@
+s3:
+  bucket: soil-sentinel
+  prefix: soil-sentinel/batch_results_2015_2018_scl_ndvi/aggregated/
+
+targets:
+  - Clay
+  - Silt
+  - Sand
+  - Coarse
+
+features:
+  include: null  # List of features to include, or null for all
+  exclude: null  # List of features to exclude
+
+pca:
+  # Columns to exclude from PCA analysis (target variables and non-features)
+  exclude_columns:
+    - point_id
+    - lat
+    - lon
+    - n_days_total
+    - n_days_kept
+    - kept_ratio
+    - coverage_median_kept
+    - coverage_min_kept
+    - Clay
+    - Silt
+    - Sand
+    - Coarse
+    - POINT_ID
+    - NUTS_0
+    - NUTS_1
+    - NUTS_2
+    - NUTS_3
+    - LC
+    - LU
+    - LC0_Desc
+    - LC1_Desc
+    - LU1_Desc
+    - SURVEY_DATE
+
+models:
+  random_forest:
+    n_estimators: [100, 200]
+    max_depth: [10, 20, None]
+    random_state: 42
+  gradient_boosting:
+    n_estimators: [100, 200]
+    learning_rate: [0.05, 0.1]
+    random_state: 42
