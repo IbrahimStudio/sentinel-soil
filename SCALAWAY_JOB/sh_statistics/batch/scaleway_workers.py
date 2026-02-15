@@ -22,7 +22,7 @@ import logging
 from ..client import StatisticsApiClient, create_client_from_env
 from ..models import JobSpec, JobResult, DailyStatsRecord, AggregatedStatsRecord
 from ..processing.parsers import parse_daily_records, aggregate_records
-from pipeline.storage import storage_from_env
+from sh_pipeline.storage import storage_from_env
 
 @dataclass
 class ScalewayWorkerConfig:

@@ -67,6 +67,12 @@ def _get_percentile50(outputs: Dict[str, Any], band_key: str) -> Optional[float]
     except Exception:
         return None
 
+
+def get_coverage_from_outputs(outputs: dict) -> float:
+    stats = outputs.get("valid", {}).get("bands", {}).get("B0", {}).get("stats", {}) or {}
+    return float(stats.get("mean", 0.0) or 0.0)
+
+
 def _get_datamask_counts(outputs: Dict[str, Any], evalscript_type: str = "features") -> DataMaskStats:
     """
     Extract data mask statistics from response
@@ -82,27 +88,23 @@ def _get_datamask_counts(outputs: Dict[str, Any], evalscript_type: str = "featur
         if evalscript_type == "only_scl":
             # For only_scl.js, calculate coverage based on actual feature bands
             # since there's no dataMask band in the response
-            sample_count = 0
-            no_data_count = 0
+            # ✅ FIXED: Accumulate counts across ALL bands, not just the first one with data
+            total_sample_count = 0
+            total_no_data_count = 0
 
-            # Check if we have valid data in any of the feature bands
-            has_valid_data = False
+            # Accumulate counts across all feature bands
             for i in range(18):  # Check all 18 feature bands
                 try:
                     band_stats = outputs["features"]["bands"][f"B{i}"]["stats"]
                     sample_count = int(band_stats.get("sampleCount", 0) or 0)
                     no_data_count = int(band_stats.get("noDataCount", 0) or 0)
-                    if sample_count > 0:
-                        has_valid_data = True
-                        break
+                    total_sample_count += sample_count
+                    total_no_data_count += no_data_count
                 except Exception:
                     continue
 
-            # If no valid data found in any band, return 0 counts
-            if not has_valid_data:
-                return DataMaskStats(sample_count=0, no_data_count=0)
-
-            return DataMaskStats(sample_count=sample_count, no_data_count=no_data_count)
+            # Return accumulated counts
+            return DataMaskStats(sample_count=total_sample_count, no_data_count=total_no_data_count)
         else:
             # For features.js, use dataMask (original behavior)
             stats = outputs.get("dataMask", {}).get("bands", {}).get("B0", {}).get("stats", {}) or {}
@@ -189,8 +191,10 @@ def parse_daily_records(
         outputs = item.get("outputs", {})
 
         # Get data mask statistics with evalscript type
-        datamask_stats = _get_datamask_counts(outputs, evalscript_type)
-        coverage = datamask_stats.coverage
+        # datamask_stats = _get_datamask_counts(outputs, evalscript_type)
+        # coverage = datamask_stats.coverage
+
+        coverage = get_coverage_from_outputs(outputs)
 
         # Create daily record
         row = DailyStatsRecord(
@@ -202,8 +206,8 @@ def parse_daily_records(
             aggregation_interval=interval,
             from_time=interval_obj.get("from"),
             to_time=interval_obj.get("to"),
-            sample_count=datamask_stats.sample_count,
-            no_data_count=datamask_stats.no_data_count,
+            # sample_count=datamask_stats.sample_count,
+            # no_data_count=datamask_stats.no_data_count,
             coverage=coverage,
             p50={}
         )

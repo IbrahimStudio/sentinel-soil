@@ -1,69 +1,117 @@
 //VERSION=3
 /**
- * Sentinel Hub Evalscript for SOC Mapping
+ * Sentinel Hub Evalscript for Soil Features + Coverage (Statistical API-ready)
  *
- * Computes 8 features for soil organic carbon prediction:
- * - 6 raw bands (B02, B03, B04, B08, B11, B12) - normalized to reflectance
- * - 2 spectral indices (NDVI, NBR2)
+ * Outputs:
+ *  - features[18]  (FLOAT32)
+ *  - valid[1]      (UINT8)  -> coverage = mean(valid); coverage_pct = 100*mean(valid)
+ *  - dataMask[1]   (UINT8)  (optional debugging)
  *
- * Includes pixel-level filtering for bare soil:
- * - SCL mask (keep only BARE_SOILS = 5)
- * - NDVI < 0.25 (exclude vegetation)
- * - NBR2 < 0.0075 (exclude high moisture)
+ * Filters (pixel-level):
+ *  - Must have dataMask==1
+ *  - SCL must NOT be in bad classes (cloud/shadow/cirrus/snow/ice + water optional)
+ *  - NDVI < NDVI_THRESHOLD (bare-ish soil constraint)
  */
+
+var NDVI_THRESHOLD = 0.25;   // change to 0.20 if you want stricter
 
 function setup() {
   return {
     input: [{
-      bands: ["B02","B03","B04","B08","B11","B12","SCL","dataMask"]
+      bands: [
+        "B02","B03","B04","B08","B11","B12",
+        "SCL",
+        "dataMask"
+      ]
     }],
     output: [
-      // 6 raw bands + 2 indices = 8 total features
-      { id: "features", bands: 8, sampleType: "FLOAT32" },
+      { id: "features", bands: 18, sampleType: "FLOAT32" },
+      { id: "valid", bands: 1, sampleType: "UINT8" },
       { id: "dataMask", bands: 1, sampleType: "UINT8" }
     ]
   };
 }
 
-function evaluatePixel(s) {
-  // --- Base pixel-level validity ---
-  var valid = s.dataMask === 1;
+function isBadSCL(scl) {
+  // Sentinel-2 L2A SCL classes (common ones):
+  // 3 = Cloud shadow
+  // 6 = Water
+  // 8 = Cloud medium probability
+  // 9 = Cloud high probability
+  // 10 = Thin cirrus
+  // 11 = Snow or ice
+  //
+  // For soil work, you can decide whether to allow 7/8.
+  // Here we are moderately permissive: exclude 3,8,9,10,11 and ALSO exclude water (6).
+  return (scl === 3) || (scl === 6) || (scl === 8) || (scl === 9) || (scl === 10) || (scl === 11);
+}
 
-  // --- SCL-based filtering: keep only BARE_SOILS (5) ---
-  var sclOk = (s.SCL === 5);
-
-  // --- Compute indices ---
+function safeDiv(num, den) {
   var eps = 1e-6;
-  var ndvi = (s.B08 - s.B04) / (s.B08 + s.B04 + eps);
-  var nbr2 = (s.B11 - s.B12) / (s.B11 + s.B12 + eps);
+  return num / (Math.abs(den) < eps ? (den >= 0 ? eps : -eps) : den);
+}
 
-  // --- Bare-soil rules ---
-  var bareOk = (ndvi < 0.25) && (nbr2 < 0.0075);
+function nd(a, b) {
+  return safeDiv(a - b, a + b);
+}
 
-  // --- Final keep mask ---
-  var keep = valid && sclOk && bareOk;
+function evaluatePixel(s) {
+  // --- Base validity: must have data and pass SCL mask ---
+  var ok = (s.dataMask === 1) && !isBadSCL(s.SCL);
 
-  // --- Normalize raw bands to reflectance (0-1 range) ---
-  // Sentinel-2 L2A DN values need to be divided by 10000 to get reflectance
-  var B02 = s.B02 / 10000.0; // Blue
-  var B03 = s.B03 / 10000.0; // Green
-  var B04 = s.B04 / 10000.0; // Red
-  var B08 = s.B08 / 10000.0; // NIR
-  var B11 = s.B11 / 10000.0; // SWIR1
-  var B12 = s.B12 / 10000.0; // SWIR2
-
-  // --- Output ---
-  // If pixel should be kept, return normalized features
-  // Otherwise return zeros (will be filtered by dataMask)
-  if (keep) {
+  // Early reject
+  if (!ok) {
     return {
-      features: [B02, B03, B04, B08, B11, B12, ndvi, nbr2],
-      dataMask: [1]
-    };
-  } else {
-    return {
-      features: [0, 0, 0, 0, 0, 0, 0, 0],
+      features: new Array(18).fill(0),
+      valid: [0],
       dataMask: [0]
     };
   }
+
+  // --- Raw bands (Sentinel Hub defaults to reflectance units for S2 optical bands) ---
+  var B02 = s.B02; // Blue
+  var B03 = s.B03; // Green
+  var B04 = s.B04; // Red
+  var B08 = s.B08; // NIR
+  var B11 = s.B11; // SWIR1
+  var B12 = s.B12; // SWIR2
+
+  // --- NDVI filter (bare-ish soil constraint) ---
+  var NDVI = nd(B08, B04);
+  if (NDVI >= NDVI_THRESHOLD) {
+    return {
+      features: new Array(18).fill(0),
+      valid: [0],
+      dataMask: [0]
+    };
+  }
+
+  // --- Indices ---
+  var NDWI  = nd(B03, B08);
+  var MNDWI = nd(B03, B11);
+  var NDMI  = nd(B08, B11);
+  var BSI   = safeDiv((B11 + B04) - (B08 + B02), (B11 + B04) + (B08 + B02));
+
+  // --- Brightness / albedo proxy ---
+  var BRIGHT = (B02 + B03 + B04 + B08 + B11 + B12) / 6.0;
+  var ALBEDO_PROXY = BRIGHT;
+
+  // --- Ratios / band proxies ---
+  var RED   = B04;
+  var SWIR1 = B11;
+  var SWIR2 = B12;
+  var RED_SWIR1_RATIO   = safeDiv(RED, SWIR1);
+  var SWIR1_SWIR2_RATIO = safeDiv(SWIR1, SWIR2);
+
+  return {
+    features: [
+      B02, B03, B04, B08, B11, B12,
+      NDVI, NDWI, MNDWI, NDMI, BSI,
+      BRIGHT, ALBEDO_PROXY,
+      RED, SWIR1, SWIR2,
+      RED_SWIR1_RATIO, SWIR1_SWIR2_RATIO
+    ],
+    valid: [1],
+    dataMask: [1]
+  };
 }

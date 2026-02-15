@@ -1,0 +1,16 @@
+{
+  "target": "Clay",
+  "cv_type": "SpatialGroupKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.3090497044680472,
+  "cv_r2_std": 0.05398985868779285,
+  "cv_rmse_mean": 9.699118459281229,
+  "cv_rmse_std": 0.39982519446084136,
+  "cv_mae_mean": 7.555055555031673,
+  "cv_mae_std": 0.41523964165667054,
+  "model": "hgb",
+  "config": "lr0.05_iter800",
+  "cv_mode": "spatial"
+}

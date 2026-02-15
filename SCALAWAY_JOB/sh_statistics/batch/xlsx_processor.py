@@ -97,7 +97,7 @@ class XlsxBatchProcessor:
                 lat = float(row["TH_LAT"])
                 lon = float(row["TH_LONG"])
 
-                # Use fixed time frame for all points (2015-2018)
+
                 start_date = self.config.start_date
                 end_date = self.config.end_date
 

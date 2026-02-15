@@ -1,0 +1,16 @@
+{
+  "target": "Clay",
+  "cv_type": "SpatialGroupKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.32561531796454596,
+  "cv_r2_std": 0.03691720944653982,
+  "cv_rmse_mean": 9.592521237283176,
+  "cv_rmse_std": 0.449509697972439,
+  "cv_mae_mean": 7.480798871524636,
+  "cv_mae_std": 0.4690650560750736,
+  "model": "rf",
+  "config": "n800_leaf4_log2",
+  "cv_mode": "spatial"
+}

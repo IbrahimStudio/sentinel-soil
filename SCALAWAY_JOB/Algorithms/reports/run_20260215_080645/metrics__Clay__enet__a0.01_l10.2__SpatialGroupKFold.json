@@ -1,0 +1,16 @@
+{
+  "target": "Clay",
+  "cv_type": "SpatialGroupKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.2239130884712349,
+  "cv_r2_std": 0.0609418366211331,
+  "cv_rmse_mean": 10.276172710618605,
+  "cv_rmse_std": 0.3576322024974127,
+  "cv_mae_mean": 8.143314343388706,
+  "cv_mae_std": 0.38213105823715093,
+  "model": "enet",
+  "config": "a0.01_l10.2",
+  "cv_mode": "spatial"
+}

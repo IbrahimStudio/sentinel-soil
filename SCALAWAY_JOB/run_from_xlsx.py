@@ -10,7 +10,7 @@ from dataclasses import dataclass
 
 import pandas as pd
 
-from pipeline.worker import run_one_job  # adjust if your module path differs
+from sh_pipeline.worker import run_one_job  # adjust if your module path differs
 
 
 # ----------------- EDIT THESE (debug-friendly) -----------------

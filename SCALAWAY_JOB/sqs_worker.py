@@ -9,7 +9,7 @@ from typing import Any, Dict, Optional
 
 import boto3
 
-from pipeline.worker import run_one_job  # <-- adjust import to your module path
+from sh_pipeline.worker import run_one_job  # <-- adjust import to your module path
 
 
 def _env(name: str, default: Optional[str] = None) -> str:

@@ -196,6 +196,9 @@ class StatisticsApiClient:
                 "features": {
                     "statistics": {"default": {"percentiles": {"k": [50]}}}
                 },
+                "valid": {
+                    "statistics": {"default": {}}
+                },
                 "dataMask": {
                     "statistics": {"default": {}}
                 },

@@ -17,7 +17,9 @@ dependencies = [
     "pyproj>=3.7.2",
     "pyyaml>=6.0.3",
     "rasterio>=1.4.4",
+    "scikit-learn>=1.8.0",
     "sentinelhub>=3.11.3",
+    "shap>=0.49.1",
     "xarray>=2025.12.0",
     "ydata-profiling>=4.18.0",
 ]

@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
-from pipeline.storage import storage_from_env
+from sh_pipeline.storage import storage_from_env
 from dotenv import load_dotenv
 
 load_dotenv('vm.env')

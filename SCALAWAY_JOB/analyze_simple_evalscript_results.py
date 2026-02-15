@@ -15,7 +15,7 @@ from typing import Dict, List, Any, Optional
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from pipeline.storage import storage_from_env
+from sh_pipeline.storage import storage_from_env
 
 # Import seaborn with alias to avoid conflict with local statistics module
 import seaborn as sns
