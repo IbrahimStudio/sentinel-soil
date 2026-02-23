@@ -1,0 +1,16 @@
+{
+  "target": "Coarse",
+  "cv_type": "SpatialGroupKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.10167006984094629,
+  "cv_r2_std": 0.05771505182318517,
+  "cv_rmse_mean": 12.189426957546434,
+  "cv_rmse_std": 0.9236571928037886,
+  "cv_mae_mean": 9.51507421967424,
+  "cv_mae_std": 0.6885467277917965,
+  "model": "enet",
+  "config": "a0.01_l10.2",
+  "cv_mode": "spatial"
+}

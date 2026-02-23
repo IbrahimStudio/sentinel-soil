@@ -1,0 +1,16 @@
+{
+  "target": "Sand",
+  "cv_type": "RandomKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.017970479050631826,
+  "cv_r2_std": 0.026094155556333008,
+  "cv_rmse_mean": 17.342755067913924,
+  "cv_rmse_std": 1.2943699367873795,
+  "cv_mae_mean": 14.169472703551966,
+  "cv_mae_std": 0.823394839954091,
+  "model": "enet",
+  "config": "a0.05_l10.5",
+  "cv_mode": "random"
+}

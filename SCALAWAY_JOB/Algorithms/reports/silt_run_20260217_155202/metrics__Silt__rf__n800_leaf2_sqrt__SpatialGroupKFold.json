@@ -1,0 +1,16 @@
+{
+  "target": "Silt",
+  "cv_type": "SpatialGroupKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.30478020422584706,
+  "cv_r2_std": 0.03771367093232303,
+  "cv_rmse_mean": 10.188832550320283,
+  "cv_rmse_std": 0.4853922836954029,
+  "cv_mae_mean": 7.979913452065612,
+  "cv_mae_std": 0.24760282849727527,
+  "model": "rf",
+  "config": "n800_leaf2_sqrt",
+  "cv_mode": "spatial"
+}

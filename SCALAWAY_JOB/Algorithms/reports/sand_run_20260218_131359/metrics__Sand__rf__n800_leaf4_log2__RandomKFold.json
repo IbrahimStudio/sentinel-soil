@@ -1,0 +1,16 @@
+{
+  "target": "Sand",
+  "cv_type": "RandomKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.14939841600116976,
+  "cv_r2_std": 0.05045039851608409,
+  "cv_rmse_mean": 16.1162530130504,
+  "cv_rmse_std": 1.015357850867293,
+  "cv_mae_mean": 13.155033924955735,
+  "cv_mae_std": 0.7070076391847441,
+  "model": "rf",
+  "config": "n800_leaf4_log2",
+  "cv_mode": "random"
+}

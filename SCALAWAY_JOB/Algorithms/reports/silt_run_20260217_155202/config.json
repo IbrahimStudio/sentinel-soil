@@ -1,0 +1,24 @@
+{
+  "input": "texture_scl_ndvi_features_clean.xlsx",
+  "targets": [
+    "Silt"
+  ],
+  "n_splits": 5,
+  "random_state": 42,
+  "top_k": 30,
+  "do_perm_importance": false,
+  "do_shap": true,
+  "provided_group_col": null,
+  "effective_group_col": "block_id",
+  "block_size_m": 20000,
+  "lat_col": "lat",
+  "lon_col": "lon",
+  "texture_cols": [
+    "Clay",
+    "Silt",
+    "Sand",
+    "Coarse"
+  ],
+  "auto_drop_other_texture_fractions": true,
+  "timestamp": "20260217_155202"
+}

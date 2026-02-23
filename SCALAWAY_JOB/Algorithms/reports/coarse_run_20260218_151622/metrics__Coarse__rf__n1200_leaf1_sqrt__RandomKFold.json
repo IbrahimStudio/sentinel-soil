@@ -1,0 +1,16 @@
+{
+  "target": "Coarse",
+  "cv_type": "RandomKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.18867365619025997,
+  "cv_r2_std": 0.03827125914487046,
+  "cv_rmse_mean": 11.572521630424223,
+  "cv_rmse_std": 1.062065084655952,
+  "cv_mae_mean": 9.008637121212121,
+  "cv_mae_std": 0.6390748715488146,
+  "model": "rf",
+  "config": "n1200_leaf1_sqrt",
+  "cv_mode": "random"
+}

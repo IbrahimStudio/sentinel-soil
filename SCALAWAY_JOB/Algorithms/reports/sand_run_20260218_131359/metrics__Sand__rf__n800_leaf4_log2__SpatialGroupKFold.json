@@ -1,0 +1,16 @@
+{
+  "target": "Sand",
+  "cv_type": "SpatialGroupKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.14519208968673583,
+  "cv_r2_std": 0.03379819765592812,
+  "cv_rmse_mean": 16.220215016491863,
+  "cv_rmse_std": 0.6769663021037718,
+  "cv_mae_mean": 13.182698478132005,
+  "cv_mae_std": 0.6129835660547576,
+  "model": "rf",
+  "config": "n800_leaf4_log2",
+  "cv_mode": "spatial"
+}

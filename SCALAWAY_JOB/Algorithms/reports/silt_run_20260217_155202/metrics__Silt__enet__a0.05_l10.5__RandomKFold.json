@@ -1,0 +1,16 @@
+{
+  "target": "Silt",
+  "cv_type": "RandomKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.22260150933062067,
+  "cv_r2_std": 0.05900946467357316,
+  "cv_rmse_mean": 10.756050248596036,
+  "cv_rmse_std": 0.9019003784746951,
+  "cv_mae_mean": 8.398092842623033,
+  "cv_mae_std": 0.5915966068548487,
+  "model": "enet",
+  "config": "a0.05_l10.5",
+  "cv_mode": "random"
+}

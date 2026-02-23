@@ -1,0 +1,16 @@
+{
+  "target": "Silt",
+  "cv_type": "SpatialGroupKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.20827452182966083,
+  "cv_r2_std": 0.023845969730131932,
+  "cv_rmse_mean": 10.871742963780166,
+  "cv_rmse_std": 0.3481061043789093,
+  "cv_mae_mean": 8.482081002394096,
+  "cv_mae_std": 0.16525586103562995,
+  "model": "enet",
+  "config": "a0.05_l10.5",
+  "cv_mode": "spatial"
+}

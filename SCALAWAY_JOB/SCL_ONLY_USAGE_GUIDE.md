@@ -116,3 +116,70 @@ python scaleway_batch_stats_from_xlsx.py \
 - Better temporal coverage across all points
 - Compatible output format for existing analysis tools
 - Maintained data quality through SCL filtering
+
+```mermaid
+flowchart TD
+  A[(LUCAS Soil Dataset)] --> B["Campionamento e filtro record"]
+  B --> C["Subset LUCAS:<br>- topsoil<br>- agricolo<br>- esclusione aree prossimali non-campo"]
+
+  C --> D["Standardizzazione geometrie e coordinate<br>AOI per record"]
+  D --> E{{Parametri pipeline}}
+
+  E -->|"bbox_size (es. 30x30 m)"| F["Definizione AOI di estrazione<br>BBox o ROI"]
+  E -->|date_range o time_window| G["Definizione intervallo temporale"]
+  E -->|evalscript_id o versione| H["Selezione logica di estrazione<br>evalscript"]
+  E -->|policy qualita e copertura| I["Regole di qualita e validita<br>osservazioni"]
+
+  F --> J{{Modalita acquisizione EO}}
+  G --> J
+  H --> J
+  I --> J
+
+  J -->|A: summary products| K["Acquisizione EO<br>prodotti statistici e aggregati"]
+  J -->|B: raster products| L["Acquisizione EO<br>prodotti raster e immagini"]
+
+  K --> M["Feature engineering<br>agnostico al formato"]
+  L --> M
+
+  M --> N["Selezione osservazioni valide<br>applicazione policy qualita"]
+  N --> O["Aggregazione e compositing<br>spaziale e temporale"]
+  O --> P["Costruzione rappresentazione model-ready<br>record-centric o pixel-centric"]
+
+  P --> Q[(Feature store e storage)]
+  Q --> R["Dataset pronto per modeling"]
+
+  R --> S1["Stage 1: predizione proprieta del suolo"]
+  S1 --> S2["Stage 2: zoning e management zones<br>opzionale"]
+
+  subgraph SGT[Ground truth e reference]
+    A
+    B
+    C
+  end
+
+  subgraph SEO[EO acquisition e processing]
+    D
+    E
+    F
+    G
+    H
+    I
+    J
+    K
+    L
+    M
+    N
+    O
+    P
+  end
+
+  subgraph SDW[Downstream tasks]
+    Q
+    R
+    S1
+    S2
+  end
+
+  classDef param fill:#f7f7f7,stroke:#333,stroke-width:1px,stroke-dasharray: 4 3;
+  class E param;
+```

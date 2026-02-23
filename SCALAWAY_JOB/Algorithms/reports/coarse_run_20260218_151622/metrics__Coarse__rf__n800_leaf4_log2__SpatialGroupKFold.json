@@ -1,0 +1,16 @@
+{
+  "target": "Coarse",
+  "cv_type": "SpatialGroupKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.1714164750193546,
+  "cv_r2_std": 0.057642138733926214,
+  "cv_rmse_mean": 11.706316122964825,
+  "cv_rmse_std": 0.9110893709966259,
+  "cv_mae_mean": 9.101906024345686,
+  "cv_mae_std": 0.6230436350185578,
+  "model": "rf",
+  "config": "n800_leaf4_log2",
+  "cv_mode": "spatial"
+}

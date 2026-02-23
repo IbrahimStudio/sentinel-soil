@@ -157,6 +157,41 @@ def parse_statistics_response(sh_json: Dict[str, Any]) -> StatisticsResponse:
 
     return response
 
+
+def _safe_get(d: Dict[str, Any], *path: str) -> Any:
+    cur: Any = d
+    for p in path:
+        if not isinstance(cur, dict) or p not in cur:
+            return None
+        cur = cur[p]
+    return cur
+
+def _get_band_stats(outputs: Dict[str, Any], output_id: str, band_id: str) -> Dict[str, Any]:
+    stats = _safe_get(outputs, output_id, "bands", band_id, "stats")
+    return stats if isinstance(stats, dict) else {}
+
+def _get_stat(outputs: Dict[str, Any], output_id: str, band_id: str, stat_name: str) -> Optional[float]:
+    v = _safe_get(outputs, output_id, "bands", band_id, "stats", stat_name)
+    return float(v) if isinstance(v, (int, float)) else None
+
+def _get_percentile(outputs: Dict[str, Any], output_id: str, band_id: str, k: int) -> Optional[float]:
+    pct = _safe_get(outputs, output_id, "bands", band_id, "stats", "percentiles")
+    if not isinstance(pct, dict):
+        return None
+
+    # Sentinel Hub often uses "50.0" keys (strings). Be robust.
+    candidates = [str(k), f"{k}.0", f"{float(k):.1f}"]
+    for key in candidates:
+        if key in pct and isinstance(pct[key], (int, float)):
+            return float(pct[key])
+    return None
+
+def _set_if_attr(obj: Any, attr: str, value: Any) -> bool:
+    if hasattr(obj, attr):
+        setattr(obj, attr, value)
+        return True
+    return False
+
 def parse_daily_records(
     sh_json: Dict[str, Any],
     *,
@@ -167,36 +202,31 @@ def parse_daily_records(
     end_date: str,
     interval: str,
     evalscript_type: str = "features"  # "features" or "only_scl"
-) -> List[DailyStatsRecord]:
+) -> List["DailyStatsRecord"]:
     """
-    Parse Sentinel Hub response into daily statistics records
+    Parse Sentinel Hub response into daily statistics records.
 
-    Args:
-        sh_json: Raw JSON response from Sentinel Hub API
-        lat: Latitude of the point
-        lon: Longitude of the point
-        bbox: Bounding box as [min_lon, min_lat, max_lon, max_lat]
-        start_date: Start date of the query
-        end_date: End date of the query
-        interval: Aggregation interval
-        evalscript_type: Type of evalscript ("features" or "only_scl")
-
-    Returns:
-        List of DailyStatsRecord objects
+    Backward compatible:
+    - Always populates row.p50[name]
+    - coverage computed from valid.mean
+    - Extra stats added if DailyStatsRecord supports them, else stored in extra_stats when available.
     """
-    out_rows: List[DailyStatsRecord] = []
+    out_rows: List["DailyStatsRecord"] = []
 
     for item in sh_json.get("data", []):
         interval_obj = item.get("interval", {})
         outputs = item.get("outputs", {})
 
-        # Get data mask statistics with evalscript type
-        # datamask_stats = _get_datamask_counts(outputs, evalscript_type)
-        # coverage = datamask_stats.coverage
+        # Coverage: mean(valid) in [0..1]
+        # (valid is UINT8 0/1; mean is coverage)
+        coverage = _get_stat(outputs, "valid", "B0", "mean")
+        if coverage is None:
+            # fallback to your existing helper if present in your codebase
+            try:
+                coverage = get_coverage_from_outputs(outputs)  # type: ignore[name-defined]
+            except Exception:
+                coverage = 0.0
 
-        coverage = get_coverage_from_outputs(outputs)
-
-        # Create daily record
         row = DailyStatsRecord(
             lat=lat,
             lon=lon,
@@ -206,19 +236,80 @@ def parse_daily_records(
             aggregation_interval=interval,
             from_time=interval_obj.get("from"),
             to_time=interval_obj.get("to"),
-            # sample_count=datamask_stats.sample_count,
-            # no_data_count=datamask_stats.no_data_count,
-            coverage=coverage,
+            coverage=float(coverage),
             p50={}
         )
 
-        # Parse all feature values
+        # Prepare containers for richer stats
+        p10: Dict[str, Optional[float]] = {}
+        p25: Dict[str, Optional[float]] = {}
+        p75: Dict[str, Optional[float]] = {}
+        p90: Dict[str, Optional[float]] = {}
+        mean: Dict[str, Optional[float]] = {}
+        stdev: Dict[str, Optional[float]] = {}
+        vmin: Dict[str, Optional[float]] = {}
+        vmax: Dict[str, Optional[float]] = {}
+
+        # Optional daily qc counters (these are per-output; same for all bands)
+        features_sample_count = _get_stat(outputs, "features", "B0", "sampleCount")
+        features_no_data_count = _get_stat(outputs, "features", "B0", "noDataCount")
+        valid_sample_count = _get_stat(outputs, "valid", "B0", "sampleCount")
+
+        # Parse all feature values (bands are named B0..B{n-1})
         for i, name in enumerate(FEATURE_COLS):
-            row.p50[name] = _get_percentile50(outputs, f"B{i}")
+            band_id = f"B{i}"
+
+            # Keep existing behavior: p50 always present
+            row.p50[name] = _get_percentile(outputs, "features", band_id, 50)
+
+            # Extra reducers
+            mean[name] = _get_stat(outputs, "features", band_id, "mean")
+            stdev[name] = _get_stat(outputs, "features", band_id, "stDev")
+            vmin[name] = _get_stat(outputs, "features", band_id, "min")
+            vmax[name] = _get_stat(outputs, "features", band_id, "max")
+
+            p10[name] = _get_percentile(outputs, "features", band_id, 10)
+            p25[name] = _get_percentile(outputs, "features", band_id, 25)
+            p75[name] = _get_percentile(outputs, "features", band_id, 75)
+            p90[name] = _get_percentile(outputs, "features", band_id, 90)
+
+        # Attach extra stats in a backward-compatible way
+        attached = False
+        attached |= _set_if_attr(row, "mean", mean)
+        attached |= _set_if_attr(row, "stdev", stdev)
+        attached |= _set_if_attr(row, "min", vmin)
+        attached |= _set_if_attr(row, "max", vmax)
+        attached |= _set_if_attr(row, "p10", p10)
+        attached |= _set_if_attr(row, "p25", p25)
+        attached |= _set_if_attr(row, "p75", p75)
+        attached |= _set_if_attr(row, "p90", p90)
+
+        # QC counters (optional)
+        attached |= _set_if_attr(row, "features_sample_count", features_sample_count)
+        attached |= _set_if_attr(row, "features_no_data_count", features_no_data_count)
+        attached |= _set_if_attr(row, "valid_sample_count", valid_sample_count)
+
+        if not attached:
+            # If your dataclass doesn't have the above fields, store everything in a single dict if possible
+            extra = {
+                "mean": mean,
+                "stdev": stdev,
+                "min": vmin,
+                "max": vmax,
+                "p10": p10,
+                "p25": p25,
+                "p75": p75,
+                "p90": p90,
+                "features_sample_count": features_sample_count,
+                "features_no_data_count": features_no_data_count,
+                "valid_sample_count": valid_sample_count,
+            }
+            _set_if_attr(row, "extra_stats", extra)
 
         out_rows.append(row)
 
     return out_rows
+
 
 def _median(vals: List[Optional[float]]) -> Optional[float]:
     """
@@ -236,28 +327,66 @@ def _median(vals: List[Optional[float]]) -> Optional[float]:
         return None
     return float(pd.Series(vv).median())
 
+from typing import Dict, List, Optional, Tuple
+
+def _as_float_or_none(x: object) -> Optional[float]:
+    if x is None:
+        return None
+    if isinstance(x, (int, float)):
+        return float(x)
+    return None
+
+def _median(vals: List[Optional[float]]) -> Optional[float]:
+    clean = sorted([v for v in vals if isinstance(v, (int, float)) and v == v])
+    if not clean:
+        return None
+    n = len(clean)
+    mid = n // 2
+    if n % 2 == 1:
+        return float(clean[mid])
+    return float((clean[mid - 1] + clean[mid]) / 2.0)
+
+def _min(vals: List[Optional[float]]) -> Optional[float]:
+    clean = [v for v in vals if isinstance(v, (int, float)) and v == v]
+    return float(min(clean)) if clean else None
+
+def _max(vals: List[Optional[float]]) -> Optional[float]:
+    clean = [v for v in vals if isinstance(v, (int, float)) and v == v]
+    return float(max(clean)) if clean else None
+
+def _mean(vals: List[Optional[float]]) -> Optional[float]:
+    clean = [v for v in vals if isinstance(v, (int, float)) and v == v]
+    return float(sum(clean) / len(clean)) if clean else None
+
+def _iqr(vals: List[Optional[float]]) -> Optional[float]:
+    # IQR = P75 - P25, using percentiles already computed per-day if available
+    # (this helper is for aggregating daily scalars; when using it, pass [p75-p25] per day)
+    clean = [v for v in vals if isinstance(v, (int, float)) and v == v]
+    return float(_median(clean)) if clean else None  # not used directly; see below
+
+def _get_dict_attr(obj: object, attr: str) -> Optional[Dict[str, Optional[float]]]:
+    d = getattr(obj, attr, None)
+    return d if isinstance(d, dict) else None
+
 def aggregate_records(
-    daily_rows: List[DailyStatsRecord],
+    daily_rows: List["DailyStatsRecord"],
     *,
     coverage_threshold: float,
-) -> Tuple[List[DailyStatsRecord], AggregatedStatsRecord]:
+) -> Tuple[List["DailyStatsRecord"], "AggregatedStatsRecord"]:
     """
-    Aggregate daily records with scene-level filtering
+    Aggregate daily records with scene-level filtering.
 
-    Args:
-        daily_rows: List of daily statistics records
-        coverage_threshold: Minimum coverage threshold for keeping records
-
-    Returns:
-        Tuple of (kept_daily_rows, aggregated_record)
+    Keeps backward compatibility:
+    - Still produces agg.p50_aggregated (median of daily p50 across kept days)
+    Adds richer aggregated summaries if AggregatedStatsRecord supports them:
+    - mean/min/max/median for (daily mean, daily stdev, daily p10/p25/p75/p90)
+    - robust variability proxies: median daily stdev; median daily IQR (p75 - p25)
     """
     total = len(daily_rows)
     kept = [r for r in daily_rows if (r.coverage is not None and r.coverage >= coverage_threshold)]
 
-    # Create base aggregated record from first daily record
     base = daily_rows[0] if total else None
     if not base:
-        # Return empty results if no input
         empty_agg = AggregatedStatsRecord(
             lat=0.0,
             lon=0.0,
@@ -287,13 +416,89 @@ def aggregate_records(
         n_days_kept=len(kept),
         kept_ratio=(len(kept) / total) if total else 0.0,
         coverage_median_kept=_median([r.coverage for r in kept]) if kept else None,
-        coverage_min_kept=min([r.coverage for r in kept]) if kept else None,
+        coverage_min_kept=_min([r.coverage for r in kept]) if kept else None,
         p50_aggregated={}
     )
 
-    # Calculate median values for each feature across kept days
+    # --- Backward-compatible aggregation: median of daily p50 across kept days
     for name in FEATURE_COLS:
-        agg.p50_aggregated[name] = _median([r.p50.get(name) for r in kept]) if kept else None
+        agg.p50_aggregated[name] = _median([_as_float_or_none(r.p50.get(name)) for r in kept]) if kept else None
+
+    # --- New: aggregate additional per-day reducers if present on DailyStatsRecord
+    daily_mean = _get_dict_attr(base, "mean")
+    daily_stdev = _get_dict_attr(base, "stdev")
+    daily_min = _get_dict_attr(base, "min")
+    daily_max = _get_dict_attr(base, "max")
+    daily_p10 = _get_dict_attr(base, "p10")
+    daily_p25 = _get_dict_attr(base, "p25")
+    daily_p75 = _get_dict_attr(base, "p75")
+    daily_p90 = _get_dict_attr(base, "p90")
+
+    has_extra = any([daily_mean, daily_stdev, daily_min, daily_max, daily_p10, daily_p25, daily_p75, daily_p90])
+
+    if has_extra and kept:
+        # Compute daily IQR (p75 - p25) per feature if available
+        daily_iqr_vals: Dict[str, Optional[float]] = {}
+        if daily_p25 and daily_p75:
+            for name in FEATURE_COLS:
+                iqr_list: List[Optional[float]] = []
+                for r in kept:
+                    p25d = _get_dict_attr(r, "p25")
+                    p75d = _get_dict_attr(r, "p75")
+                    if not p25d or not p75d:
+                        continue
+                    a = _as_float_or_none(p25d.get(name))
+                    b = _as_float_or_none(p75d.get(name))
+                    iqr_list.append((b - a) if (a is not None and b is not None) else None)
+                daily_iqr_vals[name] = _median(iqr_list)
+
+        # Helper to build aggregated dicts
+        def agg_from_daily_dict(attr: str, reducer) -> Dict[str, Optional[float]]:
+            out: Dict[str, Optional[float]] = {}
+            for name in FEATURE_COLS:
+                vals: List[Optional[float]] = []
+                for r in kept:
+                    d = _get_dict_attr(r, attr)
+                    if not d:
+                        continue
+                    vals.append(_as_float_or_none(d.get(name)))
+                out[name] = reducer(vals)
+            return out
+
+        extra_payload = {
+            # central tendency of daily reducers
+            "mean_median": agg_from_daily_dict("mean", _median) if daily_mean else None,
+            "mean_mean":   agg_from_daily_dict("mean", _mean)   if daily_mean else None,
+            "stdev_median": agg_from_daily_dict("stdev", _median) if daily_stdev else None,
+
+            # range/robust range across kept days
+            "mean_min": agg_from_daily_dict("mean", _min) if daily_mean else None,
+            "mean_max": agg_from_daily_dict("mean", _max) if daily_mean else None,
+
+            # aggregated percentiles (median across days of daily percentiles)
+            "p10_aggregated": agg_from_daily_dict("p10", _median) if daily_p10 else None,
+            "p25_aggregated": agg_from_daily_dict("p25", _median) if daily_p25 else None,
+            "p75_aggregated": agg_from_daily_dict("p75", _median) if daily_p75 else None,
+            "p90_aggregated": agg_from_daily_dict("p90", _median) if daily_p90 else None,
+
+            # daily IQR as a robust variability proxy (median across days)
+            "iqr_median": daily_iqr_vals if daily_iqr_vals else None,
+        }
+
+        # Attach to AggregatedStatsRecord in a compatibility-safe way:
+        # - if fields exist, set them
+        # - else stash into `extra_stats` if present
+        attached_any = False
+        for k, v in extra_payload.items():
+            if v is None:
+                continue
+            if hasattr(agg, k):
+                setattr(agg, k, v)
+                attached_any = True
+
+        if not attached_any and hasattr(agg, "extra_stats"):
+            # keep it structured
+            agg.extra_stats = extra_payload  # type: ignore[attr-defined]
 
     return kept, agg
 

@@ -1,0 +1,16 @@
+{
+  "target": "Sand",
+  "cv_type": "SpatialGroupKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.01435571107233129,
+  "cv_r2_std": 0.029113708093000477,
+  "cv_rmse_mean": 17.416821030188615,
+  "cv_rmse_std": 0.6515937831282398,
+  "cv_mae_mean": 14.238893553618087,
+  "cv_mae_std": 0.36449798800502475,
+  "model": "enet",
+  "config": "a0.01_l10.2",
+  "cv_mode": "spatial"
+}

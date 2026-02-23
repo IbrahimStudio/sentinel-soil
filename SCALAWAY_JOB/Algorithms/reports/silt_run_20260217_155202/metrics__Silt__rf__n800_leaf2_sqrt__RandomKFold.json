@@ -1,0 +1,16 @@
+{
+  "target": "Silt",
+  "cv_type": "RandomKFold",
+  "n_splits": 5,
+  "n_samples": 1100,
+  "n_features": 21,
+  "cv_r2_mean": 0.3134333754663251,
+  "cv_r2_std": 0.0692869880204142,
+  "cv_rmse_mean": 10.098536403255494,
+  "cv_rmse_std": 0.866930958177478,
+  "cv_mae_mean": 7.898224074832994,
+  "cv_mae_std": 0.6333488637734711,
+  "model": "rf",
+  "config": "n800_leaf2_sqrt",
+  "cv_mode": "random"
+}

@@ -135,6 +135,78 @@ class StatisticsApiClient:
                     f"Consider using larger bbox (e.g., {10*res}m) for better statistical reliability."
                 )
 
+
+# DEPRECATED VERSION: only median here
+    # def _build_stats_request(
+    #     self,
+    #     *,
+    #     bbox: List[float],
+    #     start_date: str,
+    #     end_date: str,
+    #     interval: str,
+    #     evalscript: str,
+    #     res: int = 10,
+    #     mosaicking_order: str = "leastCC",
+    #     crs: str = "http://www.opengis.net/def/crs/EPSG/0/4326",
+    # ) -> Dict[str, Any]:
+    #     """
+    #     Build a Statistics API request payload
+
+    #     Args:
+    #         bbox: Bounding box coordinates
+    #         start_date: Start date in YYYY-MM-DD format
+    #         end_date: End date in YYYY-MM-DD format
+    #         interval: Aggregation interval (e.g., "P1D" for daily)
+    #         evalscript: JavaScript evalscript for feature computation
+    #         res: Resolution in units of the CRS (meters for EPSG:3857, degrees for EPSG:4326)
+    #         mosaicking_order: Mosaicking order strategy
+    #         crs: Coordinate reference system
+
+    #     Returns:
+    #         Dictionary with complete API request payload
+
+    #     Important:
+    #         - For EPSG:4326 (default), res is in DEGREES
+    #         - For EPSG:3857, res is in METERS
+    #         - Use create_meter_based_request() for true meter-based analysis
+    #     """
+    #     return {
+    #         "input": {
+    #             "bounds": {
+    #                 "bbox": bbox,
+    #                 "properties": {"crs": crs},
+    #             },
+    #             "data": [
+    #                 {
+    #                     "type": "sentinel-2-l2a",
+    #                     "dataFilter": {"mosaickingOrder": mosaicking_order},
+    #                 }
+    #             ],
+    #         },
+    #         "aggregation": {
+    #             "timeRange": {
+    #                 "from": f"{start_date}T00:00:00Z",
+    #                 # "to" behaves as exclusive -> add 1 day
+    #                 "to": (pd.to_datetime(end_date) + pd.Timedelta(days=1)).strftime("%Y-%m-%dT00:00:00Z"),
+    #             },
+    #             "aggregationInterval": {"of": interval},
+    #             "evalscript": evalscript,
+    #             "resx": res,
+    #             "resy": res,
+    #         },
+    #         "calculations": {
+    #             "features": {
+    #                 "statistics": {"default": {"percentiles": {"k": [50]}}}
+    #             },
+    #             "valid": {
+    #                 "statistics": {"default": {}}
+    #             },
+    #             "dataMask": {
+    #                 "statistics": {"default": {}}
+    #             },
+    #         },
+    #     }
+
     def _build_stats_request(
         self,
         *,
@@ -147,27 +219,6 @@ class StatisticsApiClient:
         mosaicking_order: str = "leastCC",
         crs: str = "http://www.opengis.net/def/crs/EPSG/0/4326",
     ) -> Dict[str, Any]:
-        """
-        Build a Statistics API request payload
-
-        Args:
-            bbox: Bounding box coordinates
-            start_date: Start date in YYYY-MM-DD format
-            end_date: End date in YYYY-MM-DD format
-            interval: Aggregation interval (e.g., "P1D" for daily)
-            evalscript: JavaScript evalscript for feature computation
-            res: Resolution in units of the CRS (meters for EPSG:3857, degrees for EPSG:4326)
-            mosaicking_order: Mosaicking order strategy
-            crs: Coordinate reference system
-
-        Returns:
-            Dictionary with complete API request payload
-
-        Important:
-            - For EPSG:4326 (default), res is in DEGREES
-            - For EPSG:3857, res is in METERS
-            - Use create_meter_based_request() for true meter-based analysis
-        """
         return {
             "input": {
                 "bounds": {
@@ -194,16 +245,42 @@ class StatisticsApiClient:
             },
             "calculations": {
                 "features": {
-                    "statistics": {"default": {"percentiles": {"k": [50]}}}
+                    "statistics": {
+                        "default": {
+                            # core reducers
+                            "mean": True,
+                            "stDev": True,
+                            "min": True,
+                            "max": True,
+                            # good extra signal for ML: distribution shape
+                            "percentiles": {"k": [10, 25, 50, 75, 90]},
+                            # sometimes useful for QC/debugging
+                            "sampleCount": True,
+                            "noDataCount": True,
+                        }
+                    }
                 },
                 "valid": {
-                    "statistics": {"default": {}}
+                    "statistics": {
+                        "default": {
+                            # coverage = mean(valid) in [0..1]
+                            "mean": True,
+                            "sampleCount": True,
+                        }
+                    }
                 },
                 "dataMask": {
-                    "statistics": {"default": {}}
+                    "statistics": {
+                        "default": {
+                            # optional; useful if you want to compare with valid
+                            "mean": True,
+                            "sampleCount": True,
+                        }
+                    }
                 },
             },
         }
+
 
     def create_meter_based_request(
         self,
