@@ -1,6 +1,43 @@
 services:
 
   # ---------------------------------------------------------------------------
+  # Local S3 emulator — only started with: docker compose --profile local ...
+  # MinIO data persists in ./local_storage/ between restarts
+  # Console UI: http://localhost:9001  (user: minioadmin / minioadmin)
+  # ---------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    profiles: [local]
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - ./local_storage:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio_init:
+    image: minio/mc:latest
+    profiles: [local]
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 minioadmin minioadmin;
+      mc mb local/soil-sentinel --ignore-existing;
+      echo 'Bucket soil-sentinel ready';
+      "
+    restart: on-failure
+
+  # ---------------------------------------------------------------------------
   # Job 1 – Remote Sensing Data Acquisition
   # Reads gabri_filters.xlsx, calls Sentinel Hub Statistics API, stores to S3
   # ---------------------------------------------------------------------------
@@ -8,12 +45,13 @@ services:
     build:
       context: .
       dockerfile: ingestion/Dockerfile
+    image: rg.fr-par.scw.cloud/soil-sentinel/ingestion:latest
     command:
       - python
       - main.py
       - --xlsx
       - /data/gabri_filters.xlsx
-      - --evalscript
+      - --evalscript_path
       - sh_statistics/evalscripts/only_scl.js
       - --time_window
       - "60"
@@ -21,6 +59,7 @@ services:
       - "8"
     volumes:
       - ./gabri_filters.xlsx:/data/gabri_filters.xlsx:ro
+    env_file: .env
     environment:
       SH_CLIENT_ID: ${SH_CLIENT_ID}
       SH_CLIENT_SECRET: ${SH_CLIENT_SECRET}
@@ -38,11 +77,12 @@ services:
     build:
       context: .
       dockerfile: feature_store/Dockerfile
+    image: rg.fr-par.scw.cloud/soil-sentinel/feature-store:latest
     command:
       - python
       - main.py
       - --prefix
-      - soil-sentinel/only_scl/aggregated/
+      - ${FEATURE_STORE_PREFIX:-batch_results/aggregated/}
       - --labels
       - /data/gabri_filters.xlsx
       - --output
@@ -50,6 +90,7 @@ services:
     volumes:
       - ./gabri_filters.xlsx:/data/gabri_filters.xlsx:ro
       - ./feature_store/output:/output
+    env_file: .env
     environment:
       SCALEWAY_S3_ENDPOINT: ${SCALEWAY_S3_ENDPOINT}
       SCALEWAY_S3_REGION: ${SCALEWAY_S3_REGION:-fr-par}
@@ -65,20 +106,22 @@ services:
     build:
       context: .
       dockerfile: training/Dockerfile
+    image: rg.fr-par.scw.cloud/soil-sentinel/training:latest
     command:
       - python
       - main.py
       - --features
       - /data/features.parquet
       - --target
-      - Clay
+      - ${TARGET:-Clay}
       - --pipeline
-      - v2
+      - ${PIPELINE_VERSION:-v2}
       - --reports-dir
       - /reports
     volumes:
       - ./feature_store/output:/data:ro
       - ./training/reports:/reports
+    env_file: .env
     environment:
       TARGET: ${TARGET:-Clay}
       PIPELINE_VERSION: ${PIPELINE_VERSION:-v2}

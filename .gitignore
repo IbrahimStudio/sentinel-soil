@@ -47,6 +47,8 @@ configs/*
 # If using .env files for credentials
 .env
 .env.*
+!.env.example
+!SCALAWAY_JOB/.env.example
 vm.env
 SCALAWAY_JOB/vm.env
 
@@ -66,6 +68,9 @@ SCALAWAY_JOB/analysis_scl_plots/*
 
 # Coverage outputs
 SCALAWAY_JOB/coverage_out/*
+
+# MinIO local S3 data (docker compose --profile local)
+SCALAWAY_JOB/local_storage/
 
 # Intermediate feature tables and result files
 SCALAWAY_JOB/*.xlsx

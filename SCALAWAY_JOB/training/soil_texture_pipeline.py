@@ -709,5 +709,12 @@ def main():
     print(f" - {out_dir/'config.json'}")
 
 
+def run_pipeline(features_path: str, target: str, reports_dir: str) -> None:
+    """Entry point called from training/main.py (Docker job)."""
+    import sys
+    sys.argv = [sys.argv[0], "--input", features_path, "--targets", target, "--output_dir", reports_dir]
+    main()
+
+
 if __name__ == "__main__":
     main()
