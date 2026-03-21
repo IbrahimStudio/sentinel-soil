@@ -85,7 +85,12 @@ class ScalewayStatisticsWorker:
                 mosaicking_order="leastCC"
             )
 
+            logging.info(response)
+
             # Parse daily records
+            # Determine evalscript type based on the evalscript content
+            evalscript_type = "only_scl" if "only_scl" in evalscript.lower() else "features"
+
             daily_rows = parse_daily_records(
                 response,
                 lat=job.lat,
@@ -93,7 +98,8 @@ class ScalewayStatisticsWorker:
                 bbox=job.bbox.to_list(),
                 start_date=job.start_date,
                 end_date=job.end_date,
-                interval=interval
+                interval=interval,
+                evalscript_type=evalscript_type
             )
 
             # Aggregate records using job-specific coverage threshold
@@ -151,7 +157,12 @@ class ScalewayStatisticsWorker:
                 mosaicking_order="leastCC"
             )
 
+            print(response)
+
             # Parse daily records
+            # Determine evalscript type based on the evalscript content
+            evalscript_type = "only_scl" if "only_scl" in self.config.evalscript.lower() else "features"
+
             daily_rows = parse_daily_records(
                 response,
                 lat=job.lat,
@@ -159,7 +170,8 @@ class ScalewayStatisticsWorker:
                 bbox=job.bbox.to_list(),
                 start_date=job.start_date,
                 end_date=job.end_date,
-                interval=self.config.interval
+                interval=self.config.interval,
+                evalscript_type=evalscript_type
             )
 
             # Aggregate records using job-specific coverage threshold
@@ -216,14 +228,24 @@ class ScalewayStatisticsWorker:
         daily_parsed_key = f"{self.config.storage_prefix}/daily_parsed/{result.point_id}.jsonl"
         daily_parsed_lines = []
         for row in result.daily_rows:
-            daily_parsed_lines.append(json.dumps(row.__dict__, ensure_ascii=False))
+            # Convert to dict and ensure proper JSON serialization
+            row_dict = row.__dict__.copy()
+            # Convert any numpy types or special objects to native Python types
+            if 'p50' in row_dict and isinstance(row_dict['p50'], dict):
+                row_dict['p50'] = {k: float(v) if v is not None and hasattr(v, '__float__') else v for k, v in row_dict['p50'].items()}
+            daily_parsed_lines.append(json.dumps(row_dict, ensure_ascii=False))
         storage_client.put_text(daily_parsed_key, "\n".join(daily_parsed_lines))
 
         # Upload kept daily records
         daily_kept_key = f"{self.config.storage_prefix}/daily_kept/{result.point_id}.jsonl"
         daily_kept_lines = []
         for row in result.kept_rows:
-            daily_kept_lines.append(json.dumps(row.__dict__, ensure_ascii=False))
+            # Convert to dict and ensure proper JSON serialization
+            row_dict = row.__dict__.copy()
+            # Convert any numpy types or special objects to native Python types
+            if 'p50' in row_dict and isinstance(row_dict['p50'], dict):
+                row_dict['p50'] = {k: float(v) if v is not None and hasattr(v, '__float__') else v for k, v in row_dict['p50'].items()}
+            daily_kept_lines.append(json.dumps(row_dict, ensure_ascii=False))
         storage_client.put_text(daily_kept_key, "\n".join(daily_kept_lines))
 
     def execute_jobs(

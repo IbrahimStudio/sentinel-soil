@@ -440,7 +440,7 @@ if __name__ == "__main__":
         # Example 1: Read and aggregate data from a bucket
         print("\n--- Example 1: Basic bucket aggregation ---")
         df = read_bucket_and_aggregate_to_dataframe(
-            bucket_prefix="soil-sentinel/batch_results_2015_2018_scl_only/aggregated/"
+            bucket_prefix="soil-sentinel/only_scl/aggregated/"
         )
 
         print(f"Successfully loaded DataFrame with shape: {df.shape}")
@@ -451,7 +451,7 @@ if __name__ == "__main__":
         print(df.columns.tolist())
 
         # Get the cached xlsx path
-        xlsx_path = get_cached_xlsx_path("soil-sentinel/batch_results_2015_2018_scl_only/aggregated/")
+        xlsx_path = get_cached_xlsx_path("soil-sentinel/only_scl/aggregated/")
         if xlsx_path:
             print(f"\nCached xlsx file available at: {xlsx_path}")
 
@@ -459,9 +459,9 @@ if __name__ == "__main__":
         print("\n--- Example 2: Joining with gabri_filters.xlsx ---")
         try:
             df_joined = join_features_with_gabri_filters(
-                bucket_prefix="soil-sentinel/batch_results_2015_2018_scl_only/aggregated/",
+                bucket_prefix="soil-sentinel/only_scl/aggregated/",
                 gabri_filters_path="gabri_filters.xlsx",
-                output_path="texture_scl_features.xlsx"
+                output_path="only_scl_features_agg.xlsx"
             )
 
             print(f"Successfully created joined DataFrame with shape: {df_joined.shape}")

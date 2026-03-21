@@ -47,6 +47,40 @@ configs/*
 # If using .env files for credentials
 .env
 .env.*
+vm.env
+SCALAWAY_JOB/vm.env
+
+# -----------------------
+# SCALAWAY_JOB outputs (keep dir skeleton via .gitkeep)
+# -----------------------
+
+# ML run reports (regenerable)
+SCALAWAY_JOB/Algorithms/reports/*/
+SCALAWAY_JOB/Algorithms/reports/*.csv
+SCALAWAY_JOB/Algorithms/reports/*.png
+
+# Analysis outputs
+SCALAWAY_JOB/analysis_scl_ndvi.csv
+SCALAWAY_JOB/analysis_scl_ndvi_plots/*
+SCALAWAY_JOB/analysis_scl_plots/*
+
+# Coverage outputs
+SCALAWAY_JOB/coverage_out/*
+
+# Intermediate feature tables and result files
+SCALAWAY_JOB/*.xlsx
+SCALAWAY_JOB/*.csv
+SCALAWAY_JOB/*.json
+!SCALAWAY_JOB/gabri_filters.xlsx
+
+# Sklearn model binaries
+*.joblib
+
+# Excel temp lock files
+~$*
+
+# Always track skeleton markers
+!**/.gitkeep
 
 # -----------------------
 # Raster Data

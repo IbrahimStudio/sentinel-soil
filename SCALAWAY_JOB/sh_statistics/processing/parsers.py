@@ -41,7 +41,14 @@ def _as_float_or_none(x: Any) -> Optional[float]:
         except ValueError:
             return None
 
-    # numeric
+    # numeric - check if already a number first
+    if isinstance(x, (int, float)):
+        xf = float(x)
+        if math.isnan(xf) or math.isinf(xf):
+            return None
+        return xf
+
+    # other types - try to convert
     try:
         xf = float(x)
         if math.isnan(xf) or math.isinf(xf):
@@ -170,20 +177,128 @@ def _get_band_stats(outputs: Dict[str, Any], output_id: str, band_id: str) -> Di
     stats = _safe_get(outputs, output_id, "bands", band_id, "stats")
     return stats if isinstance(stats, dict) else {}
 
-def _get_stat(outputs: Dict[str, Any], output_id: str, band_id: str, stat_name: str) -> Optional[float]:
-    v = _safe_get(outputs, output_id, "bands", band_id, "stats", stat_name)
-    return float(v) if isinstance(v, (int, float)) else None
+# def _get_stat(outputs: Dict[str, Any], output_id: str, band_id: str, stat_name: str) -> Optional[float]:
+#     v = _safe_get(outputs, output_id, "bands", band_id, "stats", stat_name)
+#     return float(v) if isinstance(v, (int, float)) else None
 
-def _get_percentile(outputs: Dict[str, Any], output_id: str, band_id: str, k: int) -> Optional[float]:
-    pct = _safe_get(outputs, output_id, "bands", band_id, "stats", "percentiles")
-    if not isinstance(pct, dict):
+# def _get_percentile(outputs: Dict[str, Any], output_id: str, band_id: str, k: int) -> Optional[float]:
+#     pct = _safe_get(outputs, output_id, "bands", band_id, "stats", "percentiles")
+#     if not isinstance(pct, dict):
+#         return None
+
+#     # Sentinel Hub often uses "50.0" keys (strings). Be robust.
+#     candidates = [str(k), f"{k}.0", f"{float(k):.1f}"]
+#     for key in candidates:
+#         if key in pct and isinstance(pct[key], (int, float)):
+#             return float(pct[key])
+#     return None
+
+
+def _get_stat(outputs: Dict[str, Any], out_id: str, band_id: str, stat: str) -> Optional[float]:
+    """
+    Read a scalar stat from Sentinel Hub Statistical API outputs.
+
+    Tries common layouts:
+    1) outputs[out_id]['bands'][band_id]['stats'][stat]
+    2) outputs[out_id]['statistics']['default'][stat]      (rare/legacy wrappers)
+    3) outputs[out_id]['bands'][band_id][stat]             (edge cases)
+    """
+    if not outputs:
         return None
 
-    # Sentinel Hub often uses "50.0" keys (strings). Be robust.
-    candidates = [str(k), f"{k}.0", f"{float(k):.1f}"]
-    for key in candidates:
-        if key in pct and isinstance(pct[key], (int, float)):
-            return float(pct[key])
+    out = outputs.get(out_id) or {}
+    if not isinstance(out, dict):
+        return None
+
+    # 1) canonical layout
+    bands = out.get("bands")
+    if isinstance(bands, dict):
+        b = bands.get(band_id) or {}
+        if isinstance(b, dict):
+            stats = b.get("stats")
+            if isinstance(stats, dict) and stat in stats:
+                v = stats.get(stat)
+                return float(v) if v is not None else None
+            # 3) edge: stat directly under band
+            if stat in b:
+                v = b.get(stat)
+                return float(v) if v is not None else None
+
+    # 2) legacy-ish layout (if ever encountered)
+    statistics = out.get("statistics")
+    if isinstance(statistics, dict):
+        default = statistics.get("default")
+        if isinstance(default, dict) and stat in default:
+            v = default.get(stat)
+            return float(v) if v is not None else None
+
+    return None
+
+
+def _get_percentile(outputs: Dict[str, Any], out_id: str, band_id: str, p: int) -> Optional[float]:
+    """
+    Read percentile p (e.g., 10,25,50,75,90) from Statistical API outputs.
+
+    Handles common structure:
+      stats['percentiles'] = {'k':[...], 'values':[...]}   (values aligned with k)
+    Also handles flat variants like stats['p50'] if present.
+    Also handles direct dict mapping like percentiles['50.0'] = value.
+    """
+    if not outputs:
+        return None
+
+    out = outputs.get(out_id) or {}
+    if not isinstance(out, dict):
+        return None
+
+    bands = out.get("bands")
+    if not isinstance(bands, dict):
+        return None
+
+    b = bands.get(band_id) or {}
+    if not isinstance(b, dict):
+        return None
+
+    stats = b.get("stats") or {}
+    if not isinstance(stats, dict):
+        return None
+
+    # Flat variant: "p50", "p10", etc.
+    flat_key = f"p{p}"
+    if flat_key in stats:
+        v = stats.get(flat_key)
+        return _as_float_or_none(v)
+
+    # Canonical percentiles object
+    perc = stats.get("percentiles")
+    if not isinstance(perc, dict):
+        return None
+
+    # Direct dict mapping (common in Sentinel Hub responses)
+    # Try both string and float keys
+    str_key = f"{p}.0"
+    int_key = p
+    if str_key in perc:
+        v = perc[str_key]
+        return _as_float_or_none(v)
+    elif int_key in perc:
+        v = perc[int_key]
+        return _as_float_or_none(v)
+
+    # Array-based format: {'k': [...], 'values': [...]}
+    k = perc.get("k")
+    values = perc.get("values")
+
+    if isinstance(k, list) and isinstance(values, list):
+        try:
+            idx = k.index(p)
+        except ValueError:
+            return None
+        if idx < 0 or idx >= len(values):
+            return None
+        v = values[idx]
+        return _as_float_or_none(v)
+
     return None
 
 def _set_if_attr(obj: Any, attr: str, value: Any) -> bool:
@@ -219,13 +334,35 @@ def parse_daily_records(
 
         # Coverage: mean(valid) in [0..1]
         # (valid is UINT8 0/1; mean is coverage)
-        coverage = _get_stat(outputs, "valid", "B0", "mean")
-        if coverage is None:
-            # fallback to your existing helper if present in your codebase
-            try:
-                coverage = get_coverage_from_outputs(outputs)  # type: ignore[name-defined]
-            except Exception:
-                coverage = 0.0
+        if evalscript_type == "only_scl":
+            # For only_scl.js, calculate coverage based on actual feature bands
+            # since there's no dataMask band in the response
+            total_sample_count = 0
+            total_no_data_count = 0
+
+            # Accumulate counts across all feature bands
+            for i in range(18):  # Check all 18 feature bands
+                try:
+                    band_stats = outputs["features"]["bands"][f"B{i}"]["stats"]
+                    sample_count = int(band_stats.get("sampleCount", 0) or 0)
+                    no_data_count = int(band_stats.get("noDataCount", 0) or 0)
+                    total_sample_count += sample_count
+                    total_no_data_count += no_data_count
+                except Exception:
+                    continue
+
+            # Calculate coverage based on sample vs total pixels
+            total_count = total_sample_count + total_no_data_count
+            coverage = total_sample_count / total_count if total_count > 0 else 0.0
+        else:
+            # For features.js, use the standard approach
+            coverage = _get_stat(outputs, "valid", "B0", "mean")
+            if coverage is None:
+                # fallback to your existing helper if present in your codebase
+                try:
+                    coverage = get_coverage_from_outputs(outputs)  # type: ignore[name-defined]
+                except Exception:
+                    coverage = 0.0
 
         row = DailyStatsRecord(
             lat=lat,
@@ -330,11 +467,43 @@ def _median(vals: List[Optional[float]]) -> Optional[float]:
 from typing import Dict, List, Optional, Tuple
 
 def _as_float_or_none(x: object) -> Optional[float]:
+    """
+    Convert various types to float, handling special cases
+
+    Args:
+        x: Value to convert
+
+    Returns:
+        Float value or None if conversion fails or value is invalid
+    """
     if x is None:
         return None
+
+    # Sentinel Hub often returns "NaN" as a string in JSON
+    if isinstance(x, str):
+        s = x.strip().lower()
+        if s in ("nan", "null", "", "nan"):
+            return None
+        try:
+            return float(s)
+        except ValueError:
+            return None
+
+    # numeric - check if already a number first
     if isinstance(x, (int, float)):
-        return float(x)
-    return None
+        xf = float(x)
+        if math.isnan(xf) or math.isinf(xf):
+            return None
+        return xf
+
+    # other types - try to convert
+    try:
+        xf = float(x)
+        if math.isnan(xf) or math.isinf(xf):
+            return None
+        return xf
+    except Exception:
+        return None
 
 def _median(vals: List[Optional[float]]) -> Optional[float]:
     clean = sorted([v for v in vals if isinstance(v, (int, float)) and v == v])

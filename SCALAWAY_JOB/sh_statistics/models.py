@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 import math
+import pandas as pd
 
 # Feature columns mapping (B0..B17)
 FEATURE_COLS = [
@@ -186,6 +187,72 @@ class JobResult:
             self.daily_rows = []
         if self.kept_rows is None:
             self.kept_rows = []
+
+@dataclass
+class CoverageConfig:
+    """Configuration for coverage analysis"""
+    ndvi_threshold: float = 0.2
+    scl_exclude_classes: List[int] = None
+    resolution_m: int = 10
+    size_m: float = 30.0
+    mosaicking_order: str = "leastCC"
+    interval: str = "P1D"  # Daily aggregation
+
+    def __post_init__(self):
+        if self.scl_exclude_classes is None:
+            # Default: exclude clouds, shadows, water, snow/ice
+            self.scl_exclude_classes = [3, 6, 8, 9, 10, 11]
+
+@dataclass
+class CoverageStats:
+    """Coverage statistics for a single AOI and time period"""
+    aoi_id: str
+    lat: float
+    lon: float
+    date: str
+    observable_fraction: float
+    kept_scl_abs: float
+    kept_scl_ndvi_abs: float
+    saved_scl: float
+    saved_scl_ndvi: float
+    sample_count: int = 0
+    no_data_count: int = 0
+
+@dataclass
+class CoverageResult:
+    """Complete coverage analysis result"""
+    config: CoverageConfig
+    start_date: str
+    end_date: str
+    coverage_stats: List[CoverageStats]
+    summary: Dict[str, Any] = None  # Summary statistics
+
+    def __post_init__(self):
+        if self.summary is None:
+            self.summary = {}
+
+    def compute_summary(self):
+        """Compute summary statistics from coverage stats"""
+        if not self.coverage_stats:
+            return
+
+        # Extract key metrics
+        saved_scl_values = [stats.saved_scl for stats in self.coverage_stats]
+        saved_scl_ndvi_values = [stats.saved_scl_ndvi for stats in self.coverage_stats]
+
+        # Compute statistics
+        self.summary = {
+            'mean_saved_scl': float(pd.Series(saved_scl_values).mean()),
+            'median_saved_scl': float(pd.Series(saved_scl_values).median()),
+            'p10_saved_scl': float(pd.Series(saved_scl_values).quantile(0.1)),
+            'p90_saved_scl': float(pd.Series(saved_scl_values).quantile(0.9)),
+            'mean_saved_scl_ndvi': float(pd.Series(saved_scl_ndvi_values).mean()),
+            'median_saved_scl_ndvi': float(pd.Series(saved_scl_ndvi_values).median()),
+            'p10_saved_scl_ndvi': float(pd.Series(saved_scl_ndvi_values).quantile(0.1)),
+            'p90_saved_scl_ndvi': float(pd.Series(saved_scl_ndvi_values).quantile(0.9)),
+            'n_aois': len(self.coverage_stats),
+            'n_days': len(set(stats.date for stats in self.coverage_stats))
+        }
 
 def bbox_around_point_m(lat: float, lon: float, size_m: float) -> BoundingBox:
     """
