@@ -55,9 +55,9 @@ SCALAWAY_JOB/vm.env
 # -----------------------
 
 # ML run reports (regenerable)
-SCALAWAY_JOB/Algorithms/reports/*/
-SCALAWAY_JOB/Algorithms/reports/*.csv
-SCALAWAY_JOB/Algorithms/reports/*.png
+SCALAWAY_JOB/training/reports/*/
+SCALAWAY_JOB/training/reports/*.csv
+SCALAWAY_JOB/training/reports/*.png
 
 # Analysis outputs
 SCALAWAY_JOB/analysis_scl_ndvi.csv

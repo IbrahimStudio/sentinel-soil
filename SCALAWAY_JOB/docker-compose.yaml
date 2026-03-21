@@ -1,29 +1,84 @@
 services:
-  worker:
-    image: rg.fr-par.scw.cloud/soil-sentinel/worker:2026-01-27
-    command: ["python", "-m", "pipeline.sqs_worker"]
-    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Job 1 – Remote Sensing Data Acquisition
+  # Reads gabri_filters.xlsx, calls Sentinel Hub Statistics API, stores to S3
+  # ---------------------------------------------------------------------------
+  ingestion:
+    build:
+      context: .
+      dockerfile: ingestion/Dockerfile
+    command:
+      - python
+      - main.py
+      - --xlsx
+      - /data/gabri_filters.xlsx
+      - --evalscript
+      - sh_statistics/evalscripts/only_scl.js
+      - --time_window
+      - "60"
+      - --workers
+      - "8"
+    volumes:
+      - ./gabri_filters.xlsx:/data/gabri_filters.xlsx:ro
     environment:
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      AWS_DEFAULT_REGION: fr-par
-      SQS_ENDPOINT: https://sqs.mnq.fr-par.scaleway.com
-      SQS_QUEUE_URL: ${SQS_QUEUE_URL}
-
-      # knobs
-      CONFIG_PATH: configs/dev.yaml
-      WINDOW_DAYS: "15"
-      WINDOW_W: "3"
-      WINDOW_H: "3"
-      RES_M: "10"
-      NDVI_THRESHOLD: "0.2"
-      MIN_OBS: "2"
-      SQS_VISIBILITY: "900"
-      SQS_WAIT_TIME: "20"
-
-      # Object storage vars etc (whatever storage_from_env expects)
+      SH_CLIENT_ID: ${SH_CLIENT_ID}
+      SH_CLIENT_SECRET: ${SH_CLIENT_SECRET}
       SCALEWAY_S3_ENDPOINT: ${SCALEWAY_S3_ENDPOINT}
-      SCALEWAY_S3_REGION: ${SCALEWAY_S3_REGION}
+      SCALEWAY_S3_REGION: ${SCALEWAY_S3_REGION:-fr-par}
       SCALEWAY_S3_BUCKET: ${SCALEWAY_S3_BUCKET}
       SCALEWAY_ACCESS_KEY: ${SCALEWAY_ACCESS_KEY}
       SCALEWAY_SECRET_KEY: ${SCALEWAY_SECRET_KEY}
+
+  # ---------------------------------------------------------------------------
+  # Job 2 – Data Enrichment & Feature Consolidation
+  # Reads aggregated S3 JSONs, joins with labels, writes feature parquet
+  # ---------------------------------------------------------------------------
+  feature_store:
+    build:
+      context: .
+      dockerfile: feature_store/Dockerfile
+    command:
+      - python
+      - main.py
+      - --prefix
+      - soil-sentinel/only_scl/aggregated/
+      - --labels
+      - /data/gabri_filters.xlsx
+      - --output
+      - /output/features.parquet
+    volumes:
+      - ./gabri_filters.xlsx:/data/gabri_filters.xlsx:ro
+      - ./feature_store/output:/output
+    environment:
+      SCALEWAY_S3_ENDPOINT: ${SCALEWAY_S3_ENDPOINT}
+      SCALEWAY_S3_REGION: ${SCALEWAY_S3_REGION:-fr-par}
+      SCALEWAY_S3_BUCKET: ${SCALEWAY_S3_BUCKET}
+      SCALEWAY_ACCESS_KEY: ${SCALEWAY_ACCESS_KEY}
+      SCALEWAY_SECRET_KEY: ${SCALEWAY_SECRET_KEY}
+
+  # ---------------------------------------------------------------------------
+  # Job 3 – Model Training & Evaluation
+  # Loads feature table, trains regressors, writes reports/
+  # ---------------------------------------------------------------------------
+  training:
+    build:
+      context: .
+      dockerfile: training/Dockerfile
+    command:
+      - python
+      - main.py
+      - --features
+      - /data/features.parquet
+      - --target
+      - Clay
+      - --pipeline
+      - v2
+      - --reports-dir
+      - /reports
+    volumes:
+      - ./feature_store/output:/data:ro
+      - ./training/reports:/reports
+    environment:
+      TARGET: ${TARGET:-Clay}
+      PIPELINE_VERSION: ${PIPELINE_VERSION:-v2}
