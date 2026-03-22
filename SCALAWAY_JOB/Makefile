@@ -1,7 +1,26 @@
 .PHONY: build local run-ingestion run-feature-store run-training clean logs help
 
-COMPOSE = docker compose
+COMPOSE       = docker compose
 COMPOSE_LOCAL = docker compose --profile local
+
+# ── Ingestion parameters (override on the command line) ──────────────────────
+XLSX               ?= ./gabri_filters.xlsx
+EVALSCRIPT         ?= sh_statistics/evalscripts/only_scl.js
+TIME_WINDOW        ?= 60
+WORKERS            ?= 8
+NDVI_THRESHOLD     ?= 0.2
+COVERAGE_THRESHOLD ?= 0.8
+LIMIT              ?= -1
+
+# Exported so docker-compose substitution picks them up
+INGESTION_ENV = \
+  XLSX=$(XLSX) \
+  EVALSCRIPT=$(EVALSCRIPT) \
+  TIME_WINDOW=$(TIME_WINDOW) \
+  WORKERS=$(WORKERS) \
+  NDVI_THRESHOLD=$(NDVI_THRESHOLD) \
+  COVERAGE_THRESHOLD=$(COVERAGE_THRESHOLD) \
+  LIMIT=$(LIMIT)
 
 ## build: build all 3 Docker images
 build:
@@ -15,7 +34,7 @@ local: build
 	@echo "Waiting for MinIO and creating bucket..."
 	$(COMPOSE_LOCAL) run --rm minio_init
 	@echo "Running Job 1 – ingestion..."
-	$(COMPOSE) run --rm ingestion
+	$(INGESTION_ENV) $(COMPOSE) run --rm ingestion
 	@echo "Running Job 2 – feature store..."
 	$(COMPOSE) run --rm feature_store
 	@echo "Running Job 3 – training..."
@@ -28,7 +47,7 @@ minio:
 
 ## run-ingestion: run only Job 1
 run-ingestion:
-	$(COMPOSE) run --rm ingestion
+	$(INGESTION_ENV) $(COMPOSE) run --rm ingestion
 
 ## run-feature-store: run only Job 2
 run-feature-store:

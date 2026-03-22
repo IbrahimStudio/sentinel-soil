@@ -50,15 +50,21 @@ services:
       - python
       - main.py
       - --xlsx
-      - /data/gabri_filters.xlsx
+      - /data/input.xlsx
       - --evalscript_path
-      - sh_statistics/evalscripts/only_scl.js
+      - ${EVALSCRIPT:-sh_statistics/evalscripts/only_scl.js}
       - --time_window
-      - "60"
+      - "${TIME_WINDOW:-60}"
       - --workers
-      - "8"
+      - "${WORKERS:-8}"
+      - --ndvi_threshold
+      - "${NDVI_THRESHOLD:-0.2}"
+      - --coverage_threshold
+      - "${COVERAGE_THRESHOLD:-0.8}"
+      - --limit
+      - "${LIMIT:--1}"
     volumes:
-      - ./gabri_filters.xlsx:/data/gabri_filters.xlsx:ro
+      - ${XLSX:-./gabri_filters.xlsx}:/data/input.xlsx:ro
     env_file: .env
     environment:
       SH_CLIENT_ID: ${SH_CLIENT_ID}
