@@ -10,7 +10,8 @@ This directory contains the Airflow-based orchestration layer for the same three
 2. [Parallelism — current approach and future work](#2-parallelism--current-approach-and-future-work)
 3. [First-time setup](#3-first-time-setup)
 4. [Running the pipeline](#4-running-the-pipeline)
-5. [Airflow concepts quick reference](#5-airflow-concepts-quick-reference)
+5. [Known Limitations](#5-known-limitations)
+6. [Airflow concepts quick reference](#6-airflow-concepts-quick-reference)
 
 ---
 
@@ -145,7 +146,6 @@ make start         # Airflow only (when using Scaleway S3)
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `XLSX` | `gabri_filters.xlsx` | Input Excel filename inside `SCALAWAY_JOB/` |
 | `EVALSCRIPT` | `sh_statistics/evalscripts/only_scl.js` | Evalscript path (relative to ingestion container) |
 | `TIME_WINDOW` | `60` | Days around survey date to query (±30) |
 | `WORKERS` | `8` | Parallel API workers inside the ingestion container |
@@ -156,6 +156,8 @@ make start         # Airflow only (when using Scaleway S3)
 | `PIPELINE_VERSION` | `v2` | ML pipeline (`v1` = basic, `v2` = SHAP + collinearity handling) |
 
 4. Click **Trigger** — the three tasks run in sequence and you can watch progress in the Graph view.
+
+> **Note — input file:** The ingestion and feature_store tasks always use `SCALAWAY_JOB/gabri_filters.xlsx` as input. Changing the filename via a UI param is not currently supported (see Known Limitations below).
 
 ### Other useful commands
 
@@ -169,7 +171,22 @@ make help       # list all targets
 
 ---
 
-## 5. Airflow concepts quick reference
+## 5. Known Limitations
+
+### Dynamic input file selection not supported
+
+The `DockerOperator` in Airflow templates the `command` field (so `{{ params.X }}` works for CLI args) but **does not template the `mounts` field**. This means the `Mount` source path cannot be set dynamically from a DAG param at runtime.
+
+**Current behaviour:** `gabri_filters.xlsx` is hardcoded as the bind-mount source for both the ingestion and feature_store containers. To use a different input file, replace `SCALAWAY_JOB/gabri_filters.xlsx` on disk before triggering a run.
+
+**Planned fix (two options):**
+
+1. **Mount the directory instead of the file** — mount the whole `SCALAWAY_JOB/` dir at `/data/` and pass `--xlsx /data/{{ params.XLSX }}` in the command (which *is* templated). One-line change in the DAG.
+2. **Custom operator subclass** — subclass `DockerOperator`, add `mounts` to `template_fields`, and build the `Mount` object inside `execute()` after templates are rendered. More code but keeps the mount scoped to a single file.
+
+---
+
+## 6. Airflow concepts quick reference
 
 | Concept | What it is |
 |---------|-----------|

@@ -72,11 +72,6 @@ def _s3_env() -> dict:
     # ------------------------------------------------------------------
     params={
         # ── Ingestion ─────────────────────────────────────────────────
-        "XLSX": Param(
-            "gabri_filters.xlsx",
-            type="string",
-            description="Excel filename inside SCALAWAY_JOB/ (e.g. gabri_filters.xlsx)",
-        ),
         "EVALSCRIPT": Param(
             "sh_statistics/evalscripts/only_scl.js",
             type="string",
@@ -174,7 +169,7 @@ def soil_pipeline() -> None:
         ],
         mounts=[
             Mount(
-                source=f"{_SCALAWAY_JOB}/{{{{ params.XLSX }}}}",
+                source=f"{_SCALAWAY_JOB}/gabri_filters.xlsx",
                 target="/data/input.xlsx",
                 type="bind",
                 read_only=True,
@@ -200,7 +195,7 @@ def soil_pipeline() -> None:
         ],
         mounts=[
             Mount(
-                source=f"{_SCALAWAY_JOB}/{{{{ params.XLSX }}}}",
+                source=f"{_SCALAWAY_JOB}/gabri_filters.xlsx",
                 target="/data/input.xlsx",
                 type="bind",
                 read_only=True,
