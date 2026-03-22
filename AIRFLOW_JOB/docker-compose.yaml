@@ -1,0 +1,159 @@
+# ---------------------------------------------------------------------------
+# Sentinel Soil — Airflow orchestration stack
+#
+# Services:
+#   postgres          — Airflow metadata database
+#   airflow-init      — one-time DB migration + admin user creation
+#   airflow-webserver — UI at http://localhost:8080  (admin / admin)
+#   airflow-scheduler — watches DAGs and triggers task runs
+#   minio             — local S3 emulator (profile: local only)
+#   minio_init        — creates the bucket on first run (profile: local only)
+#
+# Usage:
+#   make init    — first-time setup (build image + initialise DB)
+#   make start   — start webserver + scheduler (+ MinIO if --profile local)
+#   make stop    — tear everything down
+# ---------------------------------------------------------------------------
+
+x-airflow-common: &airflow-common
+  build: .                        # uses our custom Dockerfile
+  env_file: .env
+  environment:
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:?set AIRFLOW_FERNET_KEY in .env}
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY:?set AIRFLOW_SECRET_KEY in .env}
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    # Path to repo root on the HOST machine — used by DockerOperator for volume mounts
+    HOST_REPO_PATH: ${HOST_REPO_PATH:?set HOST_REPO_PATH to the absolute path of this repo on your machine}
+    # Forward S3 + SH credentials so the scheduler can inject them into job containers
+    SH_CLIENT_ID: ${SH_CLIENT_ID}
+    SH_CLIENT_SECRET: ${SH_CLIENT_SECRET}
+    SCALEWAY_S3_ENDPOINT: ${SCALEWAY_S3_ENDPOINT}
+    SCALEWAY_S3_REGION: ${SCALEWAY_S3_REGION:-fr-par}
+    SCALEWAY_S3_BUCKET: ${SCALEWAY_S3_BUCKET}
+    SCALEWAY_ACCESS_KEY: ${SCALEWAY_ACCESS_KEY}
+    SCALEWAY_SECRET_KEY: ${SCALEWAY_SECRET_KEY}
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+    # Mount the Docker socket so DockerOperator can spawn sibling containers
+    - /var/run/docker.sock:/var/run/docker.sock
+  depends_on:
+    postgres:
+      condition: service_healthy
+  networks:
+    - soil-net
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Metadata database — stores DAG state, task history, variables, etc.
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - soil-net
+
+  # ---------------------------------------------------------------------------
+  # One-time initialisation: DB migration + admin user
+  # Run via: make init   (not kept running)
+  # ---------------------------------------------------------------------------
+  airflow-init:
+    <<: *airflow-common
+    command: >
+      bash -c "
+        airflow db migrate &&
+        airflow users create
+          --username admin
+          --password admin
+          --firstname Admin
+          --lastname User
+          --role Admin
+          --email admin@local.dev
+      "
+    restart: "no"
+
+  # ---------------------------------------------------------------------------
+  # Web UI — http://localhost:8080  (admin / admin)
+  # ---------------------------------------------------------------------------
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Scheduler — monitors DAGs and queues tasks when triggered
+  # ---------------------------------------------------------------------------
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Local S3 emulator — only started with: docker compose --profile local
+  # Console UI: http://localhost:9001  (minioadmin / minioadmin)
+  # ---------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    profiles: [local]
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - ./local_storage:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - soil-net
+
+  minio_init:
+    image: minio/mc:latest
+    profiles: [local]
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 minioadmin minioadmin;
+      mc mb local/soil-sentinel --ignore-existing;
+      echo 'Bucket soil-sentinel ready';
+      "
+    networks:
+      - soil-net
+    restart: on-failure
+
+networks:
+  # Explicit name so DockerOperator can attach job containers to it
+  soil-net:
+    name: soil-pipeline-net
+
+volumes:
+  postgres-data:
