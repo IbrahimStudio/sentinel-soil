@@ -1,6 +1,13 @@
 # Sentinel Soil — Airflow Orchestration
 
-This directory contains the Airflow-based orchestration layer for the same three-job pipeline defined in `SCALAWAY_JOB/`. The job code (ingestion, feature_store, training) is unchanged — Airflow is purely a wrapper that runs the existing Docker images in sequence, with a web UI for triggering runs and inspecting results.
+This directory contains the Airflow-based orchestration layer for the pipeline defined in `SCALAWAY_JOB/`. The job code (ingestion, feature_store, training) is unchanged — Airflow is purely a wrapper that runs the existing Docker images in sequence, with a web UI for triggering runs and inspecting results.
+
+Two DAGs are available:
+
+| DAG | Route | Description |
+|-----|-------|-------------|
+| `soil_pipeline` | Statistics API | Original pipeline — aggregated p50 features, one target at a time |
+| `soil_pipeline_v2` | Selectable via `PIPELINE_TYPE` param | Unified DAG: branches to either Statistics API or Process API chain at runtime |
 
 ---
 
@@ -21,10 +28,11 @@ This directory contains the Airflow-based orchestration layer for the same three
 AIRFLOW_JOB/
   Dockerfile              # extends apache/airflow:2.9.3, adds DockerOperator provider
   docker-compose.yaml     # postgres + airflow-webserver + airflow-scheduler + minio (local)
-  Makefile                # convenience commands: init, start, stop, logs
+  Makefile                # convenience commands: init, start, stop, build-jobs, build-jobs-v2
   .env                    # credentials and host paths (not committed)
   dags/
-    soil_pipeline.py      # the DAG: 3 tasks, manual trigger, UI params
+    soil_pipeline.py      # original DAG: 3 sequential tasks, Statistics API only
+    soil_pipeline_v2.py   # v2 DAG: BranchPythonOperator → stats_api or process_api chain
   logs/                   # written by Airflow at runtime (gitignored)
   plugins/                # empty, required by Airflow conventions
 ```
@@ -41,7 +49,7 @@ AIRFLOW_JOB/
 
 **How tasks execute:**
 
-Each task in the DAG is a `DockerOperator`. When the scheduler triggers a task, it calls the host Docker daemon (via the mounted `/var/run/docker.sock` socket) and spins up the corresponding job image as a sibling container. The container runs `main.py` with the parameters you set in the UI, writes results to S3, then is removed on success. On failure it is kept so you can inspect its logs with `docker logs`.
+Each task in the DAG is a `DockerOperator`. When the scheduler triggers a task, it calls the host Docker daemon (via the mounted `/var/run/docker.sock` socket) and spins up the corresponding job image as a sibling container. The container runs `main.py` (or `main_v2.py`) with the parameters you set in the UI, writes results to S3, then is removed on success. On failure it is kept so you can inspect its logs with `docker logs`.
 
 All three job containers join the `soil-pipeline-net` Docker network, which is also where MinIO runs, so they can reach it at `http://minio:9000`.
 
@@ -51,43 +59,32 @@ All three job containers join the `soil-pipeline-net` Docker network, which is a
 
 ### Current approach: intra-container parallelism
 
-The ingestion job handles parallelism internally via Python's `ProcessPoolExecutor`. When you set `WORKERS=8` in the trigger form, the single ingestion container fans out 8 worker processes that call the Sentinel Hub Statistics API concurrently.
+The ingestion job handles parallelism internally via Python's `ProcessPoolExecutor` (Statistics API) or `ThreadPoolExecutor` (Process API). When you set `WORKERS=8`, the single ingestion container fans out 8 worker processes/threads that call Sentinel Hub concurrently.
 
 ```
 Airflow DAG run
   └── Task: ingestion  (1 Docker container)
-        ├── worker process 1 → point_id A
-        ├── worker process 2 → point_id B
+        ├── worker 1 → point_id A
+        ├── worker 2 → point_id B
         ├── ...
-        └── worker process 8 → point_id H
+        └── worker 8 → point_id H
 ```
 
-This is appropriate here because the bottleneck is network I/O and API rate limits, not CPU. Running 8 processes saturates what the Sentinel Hub API will allow without additional effort.
+This is appropriate here because the bottleneck is network I/O and API rate limits, not CPU.
 
 ### Future improvement: dynamic task mapping
 
-A more Airflow-native approach would use **dynamic task mapping** to spawn one DockerOperator task per point (or per chunk of points) at runtime. Airflow generates the task graph dynamically based on the contents of the Excel file and runs all tasks in parallel up to a configurable concurrency limit.
+A more Airflow-native approach would use **dynamic task mapping** to spawn one DockerOperator task per chunk of points at runtime. Airflow generates the task graph dynamically and runs all chunks in parallel.
 
 ```
 Airflow DAG run
-  ├── Task: ingestion_chunk_0   (Docker container, points 0–49)
-  ├── Task: ingestion_chunk_1   (Docker container, points 50–99)
-  ├── Task: ingestion_chunk_2   (Docker container, points 100–149)
+  ├── Task: ingestion_chunk_0   (points 0–49)
+  ├── Task: ingestion_chunk_1   (points 50–99)
   └── ...
        └── (all join) → feature_store → training
 ```
 
-**Advantages over current approach:**
-- Failed chunks can be retried individually without rerunning the full ingestion
-- Per-chunk progress and logs are visible as separate tasks in the UI
-- Work can be spread across multiple machines (with CeleryExecutor or KubernetesExecutor)
-
-**Why we deferred it:**
-- Requires reading the Excel file at DAG parse time or using a sensor/pre-task to generate the chunk list
-- Higher container startup overhead (one container per chunk vs one container total)
-- The current approach already achieves good throughput for the dataset size
-
-**When to implement it:** if the dataset grows significantly, if per-point retry becomes important, or if the pipeline is moved to a multi-node Airflow deployment.
+**When to implement it:** if the dataset grows significantly, if per-point retry becomes important, or if the pipeline moves to a multi-node Airflow deployment.
 
 ---
 
@@ -96,18 +93,22 @@ Airflow DAG run
 ### Prerequisites
 
 - Docker and Docker Compose installed
-- The three job images built (from `SCALAWAY_JOB/`):
-  ```bash
-  make build-jobs
-  ```
+- Job images built (choose one or both):
+
+```bash
+# Statistics API images (ingestion:stats-api, feature-store:latest, training:stats-api)
+make build-jobs
+
+# Process API images (ingestion:process-api, training:process-api)
+# Also rebuilds the shared feature-store:latest
+make build-jobs-v2
+```
 
 ### Create your `.env` file
 
 ```bash
 cp .env.example .env
 ```
-
-Then fill in:
 
 | Variable | What to set |
 |----------|-------------|
@@ -125,7 +126,7 @@ Then fill in:
 make init
 ```
 
-This builds the custom Airflow image and runs DB migrations + creates the `admin` user. Only needed once (or after `make clean`).
+Builds the custom Airflow image and runs DB migrations + creates the `admin` user. Only needed once (or after `make clean`).
 
 ---
 
@@ -134,30 +135,53 @@ This builds the custom Airflow image and runs DB migrations + creates the `admin
 ### Start Airflow
 
 ```bash
-make start-local   # Airflow + MinIO (for local runs)
-make start         # Airflow only (when using Scaleway S3)
+make start-local   # Airflow + MinIO (local runs)
+make start         # Airflow only (Scaleway S3)
 ```
 
-### Trigger a run
+### `soil_pipeline` DAG — Statistics API
 
 1. Open http://localhost:8080 and log in (`admin` / `admin`)
-2. Find the `soil_pipeline` DAG and click **Trigger DAG w/ config**
-3. A form appears with all parameters pre-filled with defaults — edit what you need:
+2. Find `soil_pipeline` and click **Trigger DAG w/ config**
+3. Set parameters in the form:
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `EVALSCRIPT` | `sh_statistics/evalscripts/only_scl.js` | Evalscript path (relative to ingestion container) |
 | `TIME_WINDOW` | `60` | Days around survey date to query (±30) |
-| `WORKERS` | `8` | Parallel API workers inside the ingestion container |
+| `WORKERS` | `8` | Parallel API workers |
 | `NDVI_THRESHOLD` | `0.2` | Max NDVI for bare-soil classification |
 | `COVERAGE_THRESHOLD` | `0.8` | Min valid-pixel fraction to keep an acquisition |
-| `LIMIT` | `-1` | First N rows only (-1 = all). Set to e.g. `10` for a quick test. |
+| `LIMIT` | `-1` | First N rows only (−1 = all) |
 | `TARGET` | `Clay` | Soil texture target (`Clay`, `Silt`, `Sand`, `Coarse`) |
 | `PIPELINE_VERSION` | `v2` | ML pipeline (`v1` = basic, `v2` = SHAP + collinearity handling) |
 
-4. Click **Trigger** — the three tasks run in sequence and you can watch progress in the Graph view.
+4. Click **Trigger** — three tasks run in sequence: `ingestion → feature_store → training`.
 
-> **Note — input file:** The ingestion and feature_store tasks always use `SCALAWAY_JOB/gabri_filters.xlsx` as input. Changing the filename via a UI param is not currently supported (see Known Limitations below).
+> **Note — input file:** The ingestion and feature_store tasks always use `SCALAWAY_JOB/gabri_filters.xlsx` as input. See Known Limitations below.
+
+### `soil_pipeline_v2` DAG — Statistics API or Process API
+
+1. Find `soil_pipeline_v2` and click **Trigger DAG w/ config**
+2. Set `PIPELINE_TYPE` to choose the route:
+
+| `PIPELINE_TYPE` | Route taken |
+|-----------------|-------------|
+| `stats_api` | `ingestion_stats_api → feature_store_stats_api → training_stats_api` |
+| `process_api` | `ingestion_process_api → feature_store_process_api → training_process_api` |
+
+**Statistics API parameters** (same as `soil_pipeline`): `EVALSCRIPT`, `TIME_WINDOW`, `NDVI_THRESHOLD`, `COVERAGE_THRESHOLD`, `TARGET`, `PIPELINE_VERSION`
+
+**Process API parameters:**
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `TIME_WINDOW_DAYS` | `365` | Total date range around each survey date (90–3650) |
+| `RASTER_PREFIX` | `raw_rasters/` | S3 prefix for raw `.npz` raster cache |
+
+**Shared parameters:** `WORKERS`, `LIMIT`
+
+When `PIPELINE_TYPE=process_api`, the training task trains all four targets (Clay, Silt, Sand, Coarse) in a single run and writes the `.pkl` models directly to `DSM_WEBAPP/models/`.
 
 ### Other useful commands
 
@@ -175,14 +199,14 @@ make help       # list all targets
 
 ### Dynamic input file selection not supported
 
-The `DockerOperator` in Airflow templates the `command` field (so `{{ params.X }}` works for CLI args) but **does not template the `mounts` field**. This means the `Mount` source path cannot be set dynamically from a DAG param at runtime.
+The `DockerOperator` templates the `command` field but **does not template the `mounts` field**. The `Mount` source path cannot be set dynamically from a DAG param.
 
-**Current behaviour:** `gabri_filters.xlsx` is hardcoded as the bind-mount source for both the ingestion and feature_store containers. To use a different input file, replace `SCALAWAY_JOB/gabri_filters.xlsx` on disk before triggering a run.
+**Current behaviour:** `gabri_filters.xlsx` is hardcoded as the bind-mount source. To use a different file, replace it on disk before triggering.
 
 **Planned fix (two options):**
 
-1. **Mount the directory instead of the file** — mount the whole `SCALAWAY_JOB/` dir at `/data/` and pass `--xlsx /data/{{ params.XLSX }}` in the command (which *is* templated). One-line change in the DAG.
-2. **Custom operator subclass** — subclass `DockerOperator`, add `mounts` to `template_fields`, and build the `Mount` object inside `execute()` after templates are rendered. More code but keeps the mount scoped to a single file.
+1. **Mount the directory** — mount all of `SCALAWAY_JOB/` at `/data/` and pass `--xlsx /data/{{ params.XLSX }}` in the command (which *is* templated).
+2. **Custom operator subclass** — subclass `DockerOperator`, add `mounts` to `template_fields`, build the `Mount` object inside `execute()` after rendering.
 
 ---
 
@@ -190,11 +214,12 @@ The `DockerOperator` in Airflow templates the `command` field (so `{{ params.X }
 
 | Concept | What it is |
 |---------|-----------|
-| **DAG** | A Python file that describes the pipeline — which tasks exist, in what order, and with what parameters. Airflow reads it at startup and on every file change. |
-| **Task** | One unit of work within a DAG. Here: one Docker container run. |
-| **Operator** | The class that defines *how* a task executes. We use `DockerOperator`. |
-| **DAG Run** | One execution of the DAG — created each time you click Trigger. |
-| **Param** | A typed input shown in the Trigger form. Validated before the run starts. |
-| **Jinja template** | `{{ params.X }}` inside a task definition — replaced at runtime with the value from the form. |
-| **LocalExecutor** | Tasks run as subprocesses on the same machine as the scheduler. No extra workers needed. Right choice for a single VM. |
-| **DockerOperator** | Spawns a Docker container, runs it, streams its logs into Airflow's task log, then removes it on success. |
+| **DAG** | A Python file describing the pipeline — which tasks exist, in what order, with what parameters |
+| **Task** | One unit of work. Here: one Docker container run |
+| **Operator** | The class that defines *how* a task executes. We use `DockerOperator` and `BranchPythonOperator` |
+| **DAG Run** | One execution of the DAG — created each time you click Trigger |
+| **Param** | A typed input shown in the Trigger form, validated before the run starts |
+| **Jinja template** | `{{ params.X }}` inside a task definition — replaced at runtime with the form value |
+| **BranchPythonOperator** | Reads a param at runtime and returns the `task_id` of the next task to execute, skipping the other branch |
+| **LocalExecutor** | Tasks run as subprocesses on the same machine as the scheduler. Right choice for a single VM |
+| **DockerOperator** | Spawns a Docker container, streams its logs into Airflow's task log, removes it on success |

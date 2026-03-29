@@ -1,4 +1,4 @@
-.PHONY: init start start-local stop restart logs build-jobs clean help
+.PHONY: init start start-local stop restart logs build build-jobs build-jobs-v2 clean help
 
 COMPOSE       = docker compose
 COMPOSE_LOCAL = docker compose --profile local
@@ -36,10 +36,16 @@ logs:
 build:
 	$(COMPOSE) build
 
-## build-jobs: build the 3 job images from SCALAWAY_JOB
-##             required before triggering the DAG for the first time
+## build-jobs: build the Statistics API job images (ingestion:stats-api, feature-store:latest, training:stats-api)
+##             required before triggering soil_pipeline (stats_api route) for the first time
 build-jobs:
-	docker compose -f ../SCALAWAY_JOB/docker-compose.yaml build
+	docker compose -f ../SCALAWAY_JOB/docker-compose.yaml build ingestion feature_store training
+
+## build-jobs-v2: build the Process API job images (ingestion:process-api, training:process-api)
+##                required before triggering soil_pipeline_v2 (process_api route) for the first time
+build-jobs-v2:
+	docker compose -f ../SCALAWAY_JOB/docker-compose.yaml build feature_store
+	docker compose -f ../SCALAWAY_JOB/docker-compose.yaml --profile v2 build ingestion_process_api training_v2
 
 ## clean: remove all containers and volumes (wipes Airflow DB and MinIO data)
 clean:
