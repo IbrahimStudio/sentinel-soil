@@ -1,0 +1,29 @@
+{
+  "version": "2.0",
+  "catalog_prefilter": {
+    "s2:snow_ice_percentage_lt": 90,
+    "rationale": "Scene-level filters are disconnected from our 90m patch — a tile can be 80% cloudy while our patch is clear, and vice versa. All cloud, shadow, water and vegetation filtering is handled correctly at pixel level by SCL+NDVI+NBR2. The only scene-level filter worth keeping is extreme snow coverage (>90%): if the entire tile is snow-covered there is genuinely no bare soil anywhere and the API call is wasted."
+  },
+  "pixel_filter": {
+    "scl_keep_classes": [4, 5],
+    "ndvi_min": -0.1,
+    "ndvi_max": 0.25,
+    "nbr2_max": 0.125,
+    "rationale": {
+      "scl": "Allowlist: keep only SCL 4 (vegetation) and SCL 5 (bare/not-vegetated). NDVI then separates these two. All other classes (cloud, shadow, water, snow, unclassified) are implicitly rejected. scl_exclude_classes is not used — the allowlist is sufficient and safer.",
+      "ndvi_min": "NDVI > -0.1 rejects very dark pixels (water bodies, deep shadows) that SCL may miss. _safe_nd returns 0.0 when both bands are near zero, which would otherwise pass the upper bound filter.",
+      "ndvi_max": "NDVI < 0.25 removes active green vegetation. Consistent with Silvero et al. (2021), Dvorakova et al. (2022), and the existing training pipeline.",
+      "nbr2_max": "NBR2 < 0.125 removes dry crop residues and wet soils missed by NDVI. Castaldi et al. (2019), Wetterlind et al. (2025, 34 European sites). If clay predictions are truncated at high values, relax to 0.175."
+    }
+  },
+  "temporal_aggregation": {
+    "method": "median",
+    "min_valid_observations_per_pixel": 3,
+    "rationale": "Median (P50) suppresses noise and outliers."
+  },
+  "job_filters": {
+    "min_bare_soil_pixel_pct_per_date": 0.10,
+    "min_bare_soil_acquisitions": 3,
+    "rationale": "A date is kept if >=10% of field pixels pass all pixel filters. Job fails if fewer than 3 such dates exist over the time window."
+  }
+}

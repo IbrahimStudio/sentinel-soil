@@ -91,7 +91,9 @@ def load_dataset(path: str) -> pd.DataFrame:
         return pd.read_excel(p)
     if p.suffix.lower() == ".csv":
         return pd.read_csv(p)
-    raise ValueError("Unsupported file type. Use .csv or .xlsx/.xls")
+    if p.suffix.lower() == ".parquet":
+        return pd.read_parquet(p)
+    raise ValueError("Unsupported file type. Use .csv, .xlsx/.xls, or .parquet")
 
 
 def ensure_dir(d: Path) -> None:

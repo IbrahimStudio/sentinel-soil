@@ -137,6 +137,7 @@ Downloads per-date GeoTIFFs via the **Process API**, extracts time series, compu
 | Severity | Location | Issue |
 |----------|----------|-------|
 | High | `sh_statistics/processing/parsers.py` | `_as_float_or_none()` and `_median()` each defined twice |
+| Medium | `AIRFLOW_JOB/dags/soil_pipeline.py` | `XLSX` DAG param is non-functional: Airflow's `DockerOperator` does not template `mounts`, so `{{ params.XLSX }}` is never rendered in the `Mount` source path. Current workaround: `gabri_filters.xlsx` is hardcoded. Fix options: (1) mount the whole `SCALAWAY_JOB/` dir and use `--xlsx /data/{{ params.XLSX }}` in the command, (2) subclass `DockerOperator` and add `mounts` to `template_fields`. |
 | Medium | `sh_statistics/batch/scaleway_workers.py:91` | Evalscript type detected via `"only_scl" in evalscript` string — fragile |
 | Medium | `sh_statistics/batch/scaleway_workers.py:74` | Bbox size hardcoded as `resolution * 3` |
 | Medium | `sh_pipeline/worker.py:149` | `failed` variable never set to True — cleanup on failure broken |

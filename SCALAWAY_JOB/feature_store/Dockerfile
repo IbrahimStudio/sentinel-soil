@@ -26,6 +26,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 COPY feature_store/pyproject.toml /app/
 RUN uv pip install --system $(python -c "import tomllib; d=tomllib.load(open('pyproject.toml','rb')); print(' '.join(d['project']['dependencies']))")
 
+# --- Copy shared modules from ingestion ---
+COPY ingestion/sh_pipeline/ /app/sh_pipeline/
+COPY ingestion/sh_statistics/ /app/sh_statistics/
+
 # --- Copy job code ---
 COPY feature_store/ /app/
 

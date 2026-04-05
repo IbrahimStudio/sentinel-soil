@@ -112,7 +112,7 @@ services:
     build:
       context: .
       dockerfile: training/Dockerfile
-    image: rg.fr-par.scw.cloud/soil-sentinel/training:latest
+    image: rg.fr-par.scw.cloud/soil-sentinel/training:stats-api
     command:
       - python
       - main.py
@@ -131,3 +131,124 @@ services:
     environment:
       TARGET: ${TARGET:-Clay}
       PIPELINE_VERSION: ${PIPELINE_VERSION:-v2}
+
+  # ---------------------------------------------------------------------------
+  # v2 Pipeline — Process API (raw rasters → center-pixel medians → all 4 targets)
+  # Run with: make local-v2
+  # ---------------------------------------------------------------------------
+
+  ingestion_process_api:
+    profiles: [v2]
+    build:
+      context: .
+      dockerfile: ingestion/process_api/Dockerfile
+    image: rg.fr-par.scw.cloud/soil-sentinel/ingestion:process-api
+    command:
+      - python
+      - main.py
+      - --xlsx
+      - /data/input.xlsx
+      - --filter-config
+      - /data/filter_config.json
+      - --evalscript
+      - /data/evalscript.js
+      - --time-window-days
+      - "${TIME_WINDOW_DAYS:-365}"
+      - --workers
+      - "${WORKERS:-8}"
+      - --raster-prefix
+      - "${RASTER_PREFIX:-raw_rasters/}"
+      - --limit
+      - "${LIMIT:--1}"
+    volumes:
+      - ./gabri_filters.xlsx:/data/input.xlsx:ro
+      - ../DSM_WEBAPP/filter_config.json:/data/filter_config.json:ro
+      - ../DSM_WEBAPP/evalscript_process_api.js:/data/evalscript.js:ro
+    env_file: .env
+    environment:
+      SH_CLIENT_ID: ${SH_CLIENT_ID}
+      SH_CLIENT_SECRET: ${SH_CLIENT_SECRET}
+      SCALEWAY_S3_ENDPOINT: ${SCALEWAY_S3_ENDPOINT}
+      SCALEWAY_S3_BUCKET: ${SCALEWAY_S3_BUCKET}
+      SCALEWAY_ACCESS_KEY: ${SCALEWAY_ACCESS_KEY}
+      SCALEWAY_SECRET_KEY: ${SCALEWAY_SECRET_KEY}
+
+  coverage_report:
+    profiles: [v2]
+    image: rg.fr-par.scw.cloud/soil-sentinel/feature-store:latest
+    command:
+      - python
+      - coverage_report.py
+      - --xlsx
+      - /data/input.xlsx
+      - --filter-config
+      - /config/filter_config.json
+      - --raster-prefix
+      - "${RASTER_PREFIX:-raw_rasters/}"
+      - --output-dir
+      - /reports/coverage
+      - --limit
+      - "${LIMIT:--1}"
+    volumes:
+      - ./gabri_filters.xlsx:/data/input.xlsx:ro
+      - ../DSM_WEBAPP/filter_config.json:/config/filter_config.json:ro
+      - ./training/reports:/reports
+    env_file: .env
+    environment:
+      SCALEWAY_S3_ENDPOINT: ${SCALEWAY_S3_ENDPOINT}
+      SCALEWAY_S3_BUCKET: ${SCALEWAY_S3_BUCKET}
+      SCALEWAY_ACCESS_KEY: ${SCALEWAY_ACCESS_KEY}
+      SCALEWAY_SECRET_KEY: ${SCALEWAY_SECRET_KEY}
+
+  feature_store_v2:
+    profiles: [v2]
+    image: rg.fr-par.scw.cloud/soil-sentinel/feature-store:latest
+    command:
+      - python
+      - main.py
+      - --source
+      - process_api
+      - --labels
+      - /data/input.xlsx
+      - --filter-config
+      - /data/filter_config.json
+      - --raster-prefix
+      - "${RASTER_PREFIX:-raw_rasters/}"
+      - --output
+      - /output/features_v2.parquet
+    volumes:
+      - ./gabri_filters.xlsx:/data/input.xlsx:ro
+      - ../DSM_WEBAPP/filter_config.json:/data/filter_config.json:ro
+      - ./feature_store/output:/output
+    env_file: .env
+    environment:
+      SCALEWAY_S3_ENDPOINT: ${SCALEWAY_S3_ENDPOINT}
+      SCALEWAY_S3_BUCKET: ${SCALEWAY_S3_BUCKET}
+      SCALEWAY_ACCESS_KEY: ${SCALEWAY_ACCESS_KEY}
+      SCALEWAY_SECRET_KEY: ${SCALEWAY_SECRET_KEY}
+
+  training_v2:
+    profiles: [v2]
+    build:
+      context: .
+      dockerfile: training/Dockerfile.process-api
+    image: rg.fr-par.scw.cloud/soil-sentinel/training:process-api
+    command:
+      - python
+      - main_v2.py
+      - --features
+      - /data/features_v2.parquet
+      - --model-dir
+      - /models
+      - --filter-config
+      - /config/filter_config.json
+      - --reports-dir
+      - /reports
+      - --model-s3-prefix
+      - "models/process_api/"
+    volumes:
+      - ./feature_store/output:/data:ro
+      - ../DSM_WEBAPP/filter_config.json:/config/filter_config.json:ro
+      - ../DSM_WEBAPP/models:/models
+      - ./training/reports:/reports
+    env_file: .env

@@ -46,13 +46,17 @@ def _calculate_time_window_dates(survey_date: str, time_window: int) -> Tuple[st
             try:
                 # Try parsing as datetime format with potential milliseconds
                 survey_dt = datetime.strptime(survey_date, "%Y-%m-%d %H:%M:%S.%f").date()
-            except ValueError as e:
-                # If all parsing fails, try to extract just the date portion
-                if " " in survey_date:
-                    date_part = survey_date.split(" ")[0]
-                    survey_dt = datetime.strptime(date_part, "%Y-%m-%d").date()
-                else:
-                    raise ValueError(f"Could not parse date from '{survey_date}': {e}")
+            except ValueError:
+                try:
+                    # Try 2-digit year format (e.g. '16-05-18' → 2016-05-18)
+                    survey_dt = datetime.strptime(survey_date, "%y-%m-%d").date()
+                except ValueError as e:
+                    # If all parsing fails, try to extract just the date portion
+                    if " " in survey_date:
+                        date_part = survey_date.split(" ")[0]
+                        survey_dt = datetime.strptime(date_part, "%Y-%m-%d").date()
+                    else:
+                        raise ValueError(f"Could not parse date from '{survey_date}': {e}")
 
     half_window = time_window // 2
     start_date = (survey_dt - timedelta(days=half_window)).strftime("%Y-%m-%d")

@@ -71,6 +71,7 @@ SCALAWAY_JOB/coverage_out/*
 
 # MinIO local S3 data (docker compose --profile local)
 SCALAWAY_JOB/local_storage/
+AIRFLOW_JOB/local_storage/
 
 # Intermediate feature tables and result files
 SCALAWAY_JOB/*.xlsx
@@ -83,6 +84,17 @@ SCALAWAY_JOB/*.json
 
 # Excel temp lock files
 ~$*
+
+# DSM_WEBAPP — generated model artifacts (keep directory skeleton via .gitkeep)
+DSM_WEBAPP/models/*.pkl
+DSM_WEBAPP/models/*.json
+DSM_WEBAPP/models/VERSION
+
+# Claude Code local settings
+.claude/
+
+# Understand-anything tool artifacts
+.understand-anything/
 
 # Always track skeleton markers
 !**/.gitkeep
