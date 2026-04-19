@@ -24,8 +24,8 @@ from rasterio.io import MemoryFile
 log = logging.getLogger(__name__)
 
 _TOKEN_URL = "https://services.sentinel-hub.com/auth/realms/main/protocol/openid-connect/token"
-_CATALOG_URL = "https://services.sentinel-hub.com/api/v1/catalog/1.0.0/search"
-_PROCESS_URL = "https://services.sentinel-hub.com/api/v1/process"
+_CATALOG_URL = "https://services.sentinel-hub.com/catalog/v1/search"
+_PROCESS_URL = "https://services.sentinel-hub.com/process/v1"
 
 # Band order in evalscript_process_api.js — must match evalscript exactly.
 BAND_NAMES = ["B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B11", "B12", "SCL"]

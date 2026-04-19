@@ -225,6 +225,8 @@ def fetch_all_lucas_rasters(
     s3_secret_key: str,
     raster_prefix: str = "raw_rasters/",
     time_window_days: int = 365,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
     workers: int = 4,
 ) -> None:
     """
@@ -232,8 +234,9 @@ def fetch_all_lucas_rasters(
 
     Expected columns in lucas_df: POINT_ID, TH_LAT, TH_LONG, SURVEY_DATE.
 
-    time_window_days: half-width of temporal window around SURVEY_DATE.
-    Workers: number of parallel threads (I/O bound; 4–8 is reasonable).
+    start_date / end_date: when both are provided, use a fixed window for all
+    points (e.g. full Sentinel-2 archive).  Otherwise fall back to
+    ±time_window_days around each point's SURVEY_DATE.
     """
     s3, bucket = _make_s3(s3_endpoint, s3_bucket, s3_access_key, s3_secret_key)
 
@@ -242,19 +245,26 @@ def fetch_all_lucas_rasters(
 
     specs: list[FetchSpec] = []
     for _, row in lucas_df.iterrows():
-        survey = pd.to_datetime(row["SURVEY_DATE"])
-        start  = (survey - timedelta(days=time_window_days)).strftime("%Y-%m-%d")
-        end    = (survey + timedelta(days=time_window_days)).strftime("%Y-%m-%d")
+        if start_date and end_date:
+            pt_start, pt_end = start_date, end_date
+        else:
+            survey  = pd.to_datetime(row["SURVEY_DATE"])
+            pt_start = (survey - timedelta(days=time_window_days)).strftime("%Y-%m-%d")
+            pt_end   = (survey + timedelta(days=time_window_days)).strftime("%Y-%m-%d")
         specs.append(FetchSpec(
             point_id=str(row["POINT_ID"]),
             lat=float(row["TH_LAT"]),
             lon=float(row["TH_LONG"]),
-            start_date=start,
-            end_date=end,
+            start_date=pt_start,
+            end_date=pt_end,
         ))
 
-    log.info("Fetching rasters for %d LUCAS points (workers=%d, window=±%d days).",
-             len(specs), workers, time_window_days)
+    if start_date and end_date:
+        log.info("Fetching rasters for %d LUCAS points (workers=%d, fixed window %s – %s).",
+                 len(specs), workers, start_date, end_date)
+    else:
+        log.info("Fetching rasters for %d LUCAS points (workers=%d, window=±%d days).",
+                 len(specs), workers, time_window_days)
 
     failed: list[str] = []
     with ThreadPoolExecutor(max_workers=workers) as pool:

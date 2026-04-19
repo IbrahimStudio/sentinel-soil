@@ -36,7 +36,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--xlsx",            default="/data/input.xlsx",         help="Path to gabri_filters.xlsx")
     p.add_argument("--filter-config",   default="/data/filter_config.json", help="Path to filter_config.json")
     p.add_argument("--evalscript",      default="/data/evalscript.js",      help="Path to evalscript_process_api.js")
-    p.add_argument("--time-window-days",type=int,  default=365,  help="Half-width temporal window around survey date (days, max 1825)")
+    p.add_argument("--time-window-days",type=int,  default=365,  help="Half-width temporal window around survey date (days). Ignored when --start-date/--end-date are set.")
+    p.add_argument("--start-date",      default=None, help="Fixed start date for all points (YYYY-MM-DD). Overrides --time-window-days.")
+    p.add_argument("--end-date",        default=None, help="Fixed end date for all points (YYYY-MM-DD). Overrides --time-window-days.")
     p.add_argument("--workers",         type=int,  default=4,    help="Parallel fetch threads (I/O bound)")
     p.add_argument("--raster-prefix",   default="raw_rasters/",             help="S3 prefix for storing raw rasters")
     p.add_argument("--limit",           type=int,  default=-1,   help="Process only first N rows (-1 = all). Use small values for testing.")
@@ -55,8 +57,15 @@ def main() -> None:
 
     args = parse_args()
 
-    if not (90 <= args.time_window_days <= 1825):
-        sys.exit("--time-window-days must be in [90, 1825]")
+    # docker-compose renders unset env vars as empty strings — normalise to None
+    if not args.start_date:
+        args.start_date = None
+    if not args.end_date:
+        args.end_date = None
+
+    fixed_dates = bool(args.start_date and args.end_date)
+    if not fixed_dates and not (90 <= args.time_window_days <= 3650):
+        sys.exit("--time-window-days must be in [90, 3650]")
 
     # --- Load filter config ---
     import json
@@ -94,6 +103,8 @@ def main() -> None:
         s3_secret_key= os.environ["SCALEWAY_SECRET_KEY"],
         raster_prefix= args.raster_prefix,
         time_window_days=args.time_window_days,
+        start_date=args.start_date,
+        end_date=args.end_date,
         workers=args.workers,
     )
 

@@ -79,9 +79,27 @@ def _s3_env() -> dict:
         ),
         "TIME_WINDOW": Param(
             60,
-            type="integer",
-            minimum=1,
-            description="Total days around each survey date to query (e.g. 60 → ±30 days)",
+            type=["integer", "null"],
+            description=(
+                "Total days around each survey date to query (e.g. 60 → ±30 days). "
+                "Set to null/empty to use START_DATE + END_DATE instead."
+            ),
+        ),
+        "START_DATE": Param(
+            "",
+            type="string",
+            description=(
+                "Fixed start date for all points (YYYY-MM-DD). "
+                "Used when TIME_WINDOW is null (e.g. '2015-07-01' for full S2 archive)."
+            ),
+        ),
+        "END_DATE": Param(
+            "",
+            type="string",
+            description=(
+                "Fixed end date for all points (YYYY-MM-DD). "
+                "Used together with START_DATE when TIME_WINDOW is null."
+            ),
         ),
         "WORKERS": Param(
             8,
@@ -112,10 +130,10 @@ def _s3_env() -> dict:
         ),
         # ── Training ──────────────────────────────────────────────────
         "TARGET": Param(
-            "Clay",
+            "all",
             type="string",
-            enum=["Clay", "Silt", "Sand", "Coarse"],
-            description="Soil texture fraction to predict",
+            enum=["all", "Clay", "Silt", "Sand", "Coarse"],
+            description="Soil texture fraction(s) to train. 'all' trains Clay, Silt, Sand and Coarse in sequence.",
         ),
         "PIPELINE_VERSION": Param(
             "v2",
@@ -162,6 +180,8 @@ def soil_pipeline() -> None:
             "--xlsx",               "/data/input.xlsx",
             "--evalscript_path",    "{{ params.EVALSCRIPT }}",
             "--time_window",        "{{ params.TIME_WINDOW }}",
+            "--start_date",         "{{ params.START_DATE }}",
+            "--end_date",           "{{ params.END_DATE }}",
             "--workers",            "{{ params.WORKERS }}",
             "--ndvi_threshold",     "{{ params.NDVI_THRESHOLD }}",
             "--coverage_threshold", "{{ params.COVERAGE_THRESHOLD }}",

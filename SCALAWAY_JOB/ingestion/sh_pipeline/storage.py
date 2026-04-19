@@ -67,6 +67,9 @@ class StorageClient:
     def put_text(self, key: str, text: str, *, content_type: str = "text/plain") -> None:
         raise NotImplementedError
 
+    def put_bytes(self, key: str, data: bytes, *, content_type: str = "application/octet-stream") -> None:
+        raise NotImplementedError
+
 
 class S3StorageClient(StorageClient):
     def __init__(self, cfg: StorageConfig, *, logger: Optional[logging.Logger] = None):
@@ -171,40 +174,44 @@ class S3StorageClient(StorageClient):
         return count
 
     def put_text(self, key: str, text: str, *, content_type: str = "text/plain") -> None:
+        self.put_bytes(key, text.encode("utf-8"), content_type=content_type)
+
+    def put_bytes(self, key: str, data: bytes, *, content_type: str = "application/octet-stream") -> None:
         key = _norm_key(key)
         self.s3.put_object(
             Bucket=self.bucket,
             Key=key,
-            Body=text.encode("utf-8"),
+            Body=data,
             ContentType=content_type,
         )
         self.log.info(f"Put object: s3://{self.bucket}/{key}")
 
     def list_objects(self, prefix: str) -> list[str]:
-        """
-        List objects in S3 bucket with given prefix
+        """List object keys in S3 bucket with given prefix."""
+        return [obj["key"] for obj in self.list_objects_with_metadata(prefix)]
 
-        Args:
-            prefix: S3 prefix to filter objects
+    def list_objects_with_metadata(self, prefix: str) -> list[dict]:
+        """
+        List objects in S3 bucket with given prefix, including metadata.
 
         Returns:
-            List of object keys
+            List of dicts with keys: 'key', 'last_modified' (UTC datetime), 'size' (bytes)
         """
         prefix = _norm_key(prefix)
         self.log.info(f"Listing objects with prefix: s3://{self.bucket}/{prefix}")
 
         try:
             paginator = self.s3.get_paginator('list_objects_v2')
-            page_iterator = paginator.paginate(
-                Bucket=self.bucket,
-                Prefix=prefix
-            )
+            page_iterator = paginator.paginate(Bucket=self.bucket, Prefix=prefix)
 
             objects = []
             for page in page_iterator:
-                if 'Contents' in page:
-                    for obj in page['Contents']:
-                        objects.append(obj['Key'])
+                for obj in page.get('Contents', []):
+                    objects.append({
+                        "key": obj["Key"],
+                        "last_modified": obj["LastModified"],
+                        "size": obj["Size"],
+                    })
 
             self.log.info(f"Found {len(objects)} objects with prefix: {prefix}")
             return objects

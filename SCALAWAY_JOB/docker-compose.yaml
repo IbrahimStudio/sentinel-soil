@@ -54,7 +54,11 @@ services:
       - --evalscript_path
       - ${EVALSCRIPT:-sh_statistics/evalscripts/only_scl.js}
       - --time_window
-      - "${TIME_WINDOW:-60}"
+      - "${TIME_WINDOW:-}"
+      - --start_date
+      - "${START_DATE:-}"
+      - --end_date
+      - "${END_DATE:-}"
       - --workers
       - "${WORKERS:-8}"
       - --ndvi_threshold
@@ -63,12 +67,14 @@ services:
       - "${COVERAGE_THRESHOLD:-0.8}"
       - --limit
       - "${LIMIT:--1}"
+      - --storage_prefix
+      - "${STORAGE_PREFIX:-batch_results/{ts}}"
     volumes:
       - ${XLSX:-./gabri_filters.xlsx}:/data/input.xlsx:ro
     env_file: .env
     environment:
-      SH_CLIENT_ID: ${SH_CLIENT_ID}
-      SH_CLIENT_SECRET: ${SH_CLIENT_SECRET}
+      # SH credentials come from env_file — do NOT repeat them here or an empty
+      # shell variable silently overrides the .env value with a blank string.
       SCALEWAY_S3_ENDPOINT: ${SCALEWAY_S3_ENDPOINT}
       SCALEWAY_S3_REGION: ${SCALEWAY_S3_REGION:-fr-par}
       SCALEWAY_S3_BUCKET: ${SCALEWAY_S3_BUCKET}
@@ -119,7 +125,7 @@ services:
       - --features
       - /data/features.parquet
       - --target
-      - ${TARGET:-Clay}
+      - ${TARGET:-all}
       - --pipeline
       - ${PIPELINE_VERSION:-v2}
       - --reports-dir
@@ -154,6 +160,10 @@ services:
       - /data/evalscript.js
       - --time-window-days
       - "${TIME_WINDOW_DAYS:-365}"
+      - --start-date
+      - "${START_DATE:-}"
+      - --end-date
+      - "${END_DATE:-}"
       - --workers
       - "${WORKERS:-8}"
       - --raster-prefix
@@ -166,8 +176,7 @@ services:
       - ../DSM_WEBAPP/evalscript_process_api.js:/data/evalscript.js:ro
     env_file: .env
     environment:
-      SH_CLIENT_ID: ${SH_CLIENT_ID}
-      SH_CLIENT_SECRET: ${SH_CLIENT_SECRET}
+      # SH credentials come from env_file only — see comment on ingestion service.
       SCALEWAY_S3_ENDPOINT: ${SCALEWAY_S3_ENDPOINT}
       SCALEWAY_S3_BUCKET: ${SCALEWAY_S3_BUCKET}
       SCALEWAY_ACCESS_KEY: ${SCALEWAY_ACCESS_KEY}

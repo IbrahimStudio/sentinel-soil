@@ -73,8 +73,19 @@ def _s3_env() -> dict:
             description="Evalscript path inside the ingestion container (stats_api only)",
         ),
         "TIME_WINDOW": Param(
-            60, type="integer", minimum=1,
-            description="Total days around survey date (stats_api only, e.g. 60 → ±30 days)",
+            60, type=["integer", "null"],
+            description=(
+                "Total days around survey date (stats_api only, e.g. 60 → ±30 days). "
+                "Set to null/empty to use START_DATE + END_DATE for a fixed global window."
+            ),
+        ),
+        "START_DATE": Param(
+            "", type="string",
+            description="Fixed start date YYYY-MM-DD for all points (stats_api only, used when TIME_WINDOW is null).",
+        ),
+        "END_DATE": Param(
+            "", type="string",
+            description="Fixed end date YYYY-MM-DD for all points (stats_api only, used when TIME_WINDOW is null).",
         ),
         "NDVI_THRESHOLD": Param(
             0.2, type="number", minimum=0.0, maximum=1.0,
@@ -85,8 +96,8 @@ def _s3_env() -> dict:
             description="Min valid-pixel fraction (stats_api only)",
         ),
         "TARGET": Param(
-            "Clay", type="string", enum=["Clay", "Silt", "Sand", "Coarse"],
-            description="Soil texture fraction to predict (stats_api only — process_api trains all 4)",
+            "all", type="string", enum=["all", "Clay", "Silt", "Sand", "Coarse"],
+            description="Soil texture fraction(s) to train (stats_api only). 'all' trains Clay, Silt, Sand and Coarse in sequence. process_api always trains all 4.",
         ),
         "PIPELINE_VERSION": Param(
             "v2", type="string", enum=["v1", "v2"],
@@ -147,6 +158,8 @@ def soil_pipeline_v2() -> None:
             "--xlsx",               "/data/input.xlsx",
             "--evalscript_path",    "{{ params.EVALSCRIPT }}",
             "--time_window",        "{{ params.TIME_WINDOW }}",
+            "--start_date",         "{{ params.START_DATE }}",
+            "--end_date",           "{{ params.END_DATE }}",
             "--workers",            "{{ params.WORKERS }}",
             "--ndvi_threshold",     "{{ params.NDVI_THRESHOLD }}",
             "--coverage_threshold", "{{ params.COVERAGE_THRESHOLD }}",

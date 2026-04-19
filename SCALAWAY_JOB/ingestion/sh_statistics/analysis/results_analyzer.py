@@ -68,8 +68,6 @@ class ResultsAnalyzer:
     def __init__(self, config: AnalysisConfig):
         self.config = config
         self.storage_client = None
-        self.output_dir = config.output_dir
-        self.output_dir.mkdir(parents=True, exist_ok=True)
         # Storage client is initialized lazily only when needed
 
         # Caching mechanism for aggregated results
@@ -289,11 +287,16 @@ class ResultsAnalyzer:
             how='left'
         )
 
-        # Save if output path provided
         if output_path:
-            output_path.parent.mkdir(parents=True, exist_ok=True)
-            joined_df.to_excel(output_path, index=False)
-            print(f"✅ Joined data saved to: {output_path}")
+            import io
+            if self.storage_client is None:
+                self.storage_client = storage_from_env()
+            buf = io.BytesIO()
+            joined_df.to_excel(buf, index=False)
+            key = f"{self.config.storage_prefix}/analysis/{output_path}"
+            self.storage_client.put_bytes(key, buf.getvalue(),
+                                          content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            print(f"Uploaded joined data to: s3://{key}")
 
         return joined_df
 
@@ -338,56 +341,40 @@ class ResultsAnalyzer:
             }
         }
 
-        # Save report if path provided
         if report_path:
-            with open(report_path, 'w', encoding='utf-8') as f:
-                json.dump(report, f, indent=2, ensure_ascii=False)
-            print(f"✅ Summary report saved to: {report_path}")
+            if self.storage_client is None:
+                self.storage_client = storage_from_env()
+            key = f"{self.config.storage_prefix}/analysis/{report_path}"
+            self.storage_client.put_text(key, json.dumps(report, indent=2, ensure_ascii=False),
+                                         content_type="application/json")
+            print(f"Uploaded summary report to: s3://{key}")
 
         return report
 
     def analyze_and_report(self, output_prefix: str = "analysis"):
         """
-        Complete analysis pipeline: compute stats, join data, generate reports
-
-        Args:
-            output_prefix: Prefix for output files
+        Complete analysis pipeline: compute stats, join data, generate reports.
+        All outputs are uploaded to S3 under {storage_prefix}/analysis/.
         """
-        print("🔍 Starting comprehensive analysis...")
+        print("Starting comprehensive analysis...")
 
-        # Create output directory
-        output_dir = self.output_dir / output_prefix
-        output_dir.mkdir(parents=True, exist_ok=True)
-
-        # 1. Compute statistics
-        print("📊 Computing statistics...")
         stats = self.compute_statistics()
-
         print(f"   Total points processed: {stats.total_points}")
         print(f"   Points with valid data: {stats.points_with_data}")
         print(f"   Total aggregated medians: {stats.total_aggregated_medians}")
-        if stats.total_points > 0:
-            print(f"   Data availability rate: {stats.points_with_data / stats.total_points:.1%}")
-        else:
-            print(f"   Data availability rate: 0.0%")
+        rate = stats.points_with_data / stats.total_points if stats.total_points > 0 else 0
+        print(f"   Data availability rate: {rate:.1%}")
 
-        # 2. Generate summary report
-        print("📋 Generating summary report...")
-        report = self.generate_summary_report(output_dir / f"{output_prefix}_report.json")
+        report = self.generate_summary_report(f"{output_prefix}_report.json")
 
-        # 3. Join with source data (if source XLSX provided)
         if self.config.xlsx_path:
-            print("🔗 Joining with source data...")
-            joined_df = self.join_with_source_xlsx(output_dir / f"{output_prefix}_joined.xlsx")
+            joined_df = self.join_with_source_xlsx(f"{output_prefix}_joined.xlsx")
             print(f"   Joined dataset shape: {joined_df.shape}")
 
-        print(f"✅ Analysis complete! Results saved to: {output_dir}/")
+        s3_prefix = f"{self.config.storage_prefix}/analysis/"
+        print(f"Analysis complete. Results uploaded to s3://{s3_prefix}")
 
-        return {
-            "statistics": stats,
-            "report": report,
-            "output_directory": output_dir
-        }
+        return {"statistics": stats, "report": report}
 
 def create_results_analyzer(
     storage_prefix: str = "batch_results",

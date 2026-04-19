@@ -25,7 +25,7 @@ load_dotenv("vm.env")
 
 # Sentinel Hub API endpoints
 TOKEN_URL = "https://services.sentinel-hub.com/auth/realms/main/protocol/openid-connect/token"
-STATS_URL = "https://services.sentinel-hub.com/api/v1/statistics"
+STATS_URL = "https://services.sentinel-hub.com/statistics/v1"
 
 @dataclass
 class StatisticsApiConfig:
@@ -35,7 +35,7 @@ class StatisticsApiConfig:
     token_url: str = TOKEN_URL
     stats_url: str = STATS_URL
     max_retries: int = 3
-    timeout: int = 30
+    timeout: int = 300
 
 class StatisticsApiClient:
     """
@@ -519,29 +519,18 @@ class StatisticsApiClient:
         """Context manager exit - ensure session is closed"""
         self.close()
 
+_client_singleton: Optional[StatisticsApiClient] = None
+
+
 def create_client_from_env() -> StatisticsApiClient:
-    """
-    Create a StatisticsApiClient using environment variables
-
-    Expects:
-        SH_CLIENT_ID: Sentinel Hub client ID
-        SH_CLIENT_SECRET: Sentinel Hub client secret
-
-    Returns:
-        Configured StatisticsApiClient instance
-
-    Raises:
-        ValueError: If required environment variables are missing
-    """
-    client_id = os.getenv("SH_CLIENT_ID")
-    client_secret = os.getenv("SH_CLIENT_SECRET")
-
-    if not client_id or not client_secret:
-        raise ValueError("Missing environment variables SH_CLIENT_ID and/or SH_CLIENT_SECRET")
-
-    config = StatisticsApiConfig(
-        client_id=client_id,
-        client_secret=client_secret
-    )
-
-    return StatisticsApiClient(config)
+    """Return a process-level singleton client, creating it on first call."""
+    global _client_singleton
+    if _client_singleton is None:
+        client_id = os.getenv("SH_CLIENT_ID")
+        client_secret = os.getenv("SH_CLIENT_SECRET")
+        if not client_id or not client_secret:
+            raise ValueError("Missing environment variables SH_CLIENT_ID and/or SH_CLIENT_SECRET")
+        _client_singleton = StatisticsApiClient(
+            StatisticsApiConfig(client_id=client_id, client_secret=client_secret)
+        )
+    return _client_singleton

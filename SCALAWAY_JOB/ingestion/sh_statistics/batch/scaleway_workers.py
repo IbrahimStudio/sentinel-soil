@@ -15,14 +15,95 @@ import queue
 import threading
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
+from datetime import date, datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Callable
+from typing import Any, Dict, List, Optional, Callable, Tuple
 import logging
 
 from ..client import StatisticsApiClient, create_client_from_env
 from ..models import JobSpec, JobResult, DailyStatsRecord, AggregatedStatsRecord
 from ..processing.parsers import parse_daily_records, aggregate_records
 from sh_pipeline.storage import storage_from_env
+
+# Per-worker-process singletons — set by _worker_process_init
+_proc_sh_client: Optional[StatisticsApiClient] = None
+_proc_evalscript: str = ""
+_proc_interval: str = "P1D"
+_proc_resolution: int = 10
+
+
+def _worker_process_init(evalscript: str, interval: str, resolution: int) -> None:
+    """Runs once per worker process; creates shared clients so jobs don't repeat the OAuth handshake."""
+    global _proc_sh_client, _proc_evalscript, _proc_interval, _proc_resolution
+    _proc_sh_client = create_client_from_env()
+    _proc_evalscript = evalscript
+    _proc_interval = interval
+    _proc_resolution = resolution
+
+
+def _execute_job_in_worker(job: JobSpec) -> JobResult:
+    """Module-level job runner — uses the per-process client set by _worker_process_init."""
+    try:
+        client = _proc_sh_client
+        size_m = _proc_resolution * 3
+        evalscript_type = "only_scl" if "only_scl" in _proc_evalscript.lower() else "features"
+
+        chunks = _year_chunks(job.start_date, job.end_date)
+        all_daily_rows = []
+
+        for chunk_start, chunk_end in chunks:
+            response = client.request_statistics_meter_based(
+                lat=job.lat,
+                lon=job.lon,
+                size_m=size_m,
+                resolution_m=_proc_resolution,
+                start_date=chunk_start,
+                end_date=chunk_end,
+                interval=_proc_interval,
+                evalscript=_proc_evalscript,
+                mosaicking_order="leastCC"
+            )
+
+            logging.info("chunk %s–%s: %d intervals", chunk_start, chunk_end,
+                         len(response.get("data", [])))
+
+            chunk_rows = parse_daily_records(
+                response,
+                lat=job.lat,
+                lon=job.lon,
+                bbox=job.bbox.to_list(),
+                start_date=chunk_start,
+                end_date=chunk_end,
+                interval=_proc_interval,
+                evalscript_type=evalscript_type
+            )
+            all_daily_rows.extend(chunk_rows)
+
+        for row in all_daily_rows:
+            row.query_start_date = job.start_date
+            row.query_end_date = job.end_date
+
+        kept_rows, aggregated = aggregate_records(
+            all_daily_rows,
+            coverage_threshold=job.coverage_threshold
+        )
+
+        return JobResult(
+            status="SUCCESS",
+            job_id=job.job_id,
+            point_id=job.point_id,
+            daily_rows=all_daily_rows,
+            kept_rows=kept_rows,
+            aggregated=aggregated
+        )
+
+    except Exception as e:
+        return JobResult(
+            status="FAILED",
+            job_id=job.job_id,
+            point_id=job.point_id,
+            error=str(e)
+        )
 
 @dataclass
 class ScalewayWorkerConfig:
@@ -33,6 +114,26 @@ class ScalewayWorkerConfig:
     coverage_threshold: float = 0.8
     max_workers: int = 3
     storage_prefix: str = "batch_results"
+
+def _year_chunks(start_date: str, end_date: str) -> List[Tuple[str, str]]:
+    """Split a date range into calendar-year-sized chunks.
+
+    A 10-year daily request (~3 650 intervals) can exceed the SH Statistics API
+    server timeout. Splitting into annual sub-requests keeps each call under
+    ~365 intervals and is safe to reassemble.
+    """
+    start = datetime.strptime(start_date, "%Y-%m-%d").date()
+    end = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+    chunks: List[Tuple[str, str]] = []
+    chunk_start = start
+    while chunk_start <= end:
+        chunk_end = date(chunk_start.year, 12, 31)
+        chunk_end = min(chunk_end, end)
+        chunks.append((chunk_start.strftime("%Y-%m-%d"), chunk_end.strftime("%Y-%m-%d")))
+        chunk_start = date(chunk_start.year + 1, 1, 1)
+    return chunks
+
 
 class ScalewayStatisticsWorker:
     """
@@ -52,150 +153,6 @@ class ScalewayStatisticsWorker:
             self._storage_client = storage_from_env(logger=self.logger)
         return self._storage_client
 
-    @staticmethod
-    def _execute_single_job_static(job: JobSpec, evalscript: str, interval: str, resolution: int) -> JobResult:
-        """
-        Static version of job execution that can be pickled for ProcessPoolExecutor
-
-        Args:
-            job: Job specification to execute
-            evalscript: Evalscript for feature computation
-            interval: Aggregation interval
-            resolution: Spatial resolution in meters
-
-        Returns:
-            JobResult with execution results
-        """
-        try:
-            # Create API client
-            client = create_client_from_env()
-
-            # Execute API request using meter-based implementation
-            size_m = resolution * 3  # 3x3 pixels minimum
-
-            response = client.request_statistics_meter_based(
-                lat=job.lat,
-                lon=job.lon,
-                size_m=size_m,
-                resolution_m=resolution,
-                start_date=job.start_date,
-                end_date=job.end_date,
-                interval=interval,
-                evalscript=evalscript,
-                mosaicking_order="leastCC"
-            )
-
-            logging.info(response)
-
-            # Parse daily records
-            # Determine evalscript type based on the evalscript content
-            evalscript_type = "only_scl" if "only_scl" in evalscript.lower() else "features"
-
-            daily_rows = parse_daily_records(
-                response,
-                lat=job.lat,
-                lon=job.lon,
-                bbox=job.bbox.to_list(),
-                start_date=job.start_date,
-                end_date=job.end_date,
-                interval=interval,
-                evalscript_type=evalscript_type
-            )
-
-            # Aggregate records using job-specific coverage threshold
-            kept_rows, aggregated = aggregate_records(
-                daily_rows,
-                coverage_threshold=job.coverage_threshold
-            )
-
-            return JobResult(
-                status="SUCCESS",
-                job_id=job.job_id,
-                point_id=job.point_id,
-                daily_rows=daily_rows,
-                kept_rows=kept_rows,
-                aggregated=aggregated
-            )
-
-        except Exception as e:
-            return JobResult(
-                status="FAILED",
-                job_id=job.job_id,
-                point_id=job.point_id,
-                error=str(e)
-            )
-
-    def _execute_single_job(self, job: JobSpec) -> JobResult:
-        """
-        Execute a single statistics API job using meter-based requests
-
-        Args:
-            job: Job specification to execute
-
-        Returns:
-            JobResult with execution results
-        """
-        try:
-            # Create API client
-            client = create_client_from_env()
-
-            # Execute API request using meter-based implementation
-            # Note: We need to extract bbox size from the job's bbox
-            # For now, we'll use a fixed size_m that matches the resolution
-            # In a production system, we would calculate the actual size from the bbox
-            size_m = self.config.resolution * 3  # 3x3 pixels minimum
-
-            response = client.request_statistics_meter_based(
-                lat=job.lat,
-                lon=job.lon,
-                size_m=size_m,
-                resolution_m=self.config.resolution,
-                start_date=job.start_date,
-                end_date=job.end_date,
-                interval=self.config.interval,
-                evalscript=self.config.evalscript,
-                mosaicking_order="leastCC"
-            )
-
-            print(response)
-
-            # Parse daily records
-            # Determine evalscript type based on the evalscript content
-            evalscript_type = "only_scl" if "only_scl" in self.config.evalscript.lower() else "features"
-
-            daily_rows = parse_daily_records(
-                response,
-                lat=job.lat,
-                lon=job.lon,
-                bbox=job.bbox.to_list(),
-                start_date=job.start_date,
-                end_date=job.end_date,
-                interval=self.config.interval,
-                evalscript_type=evalscript_type
-            )
-
-            # Aggregate records using job-specific coverage threshold
-            kept_rows, aggregated = aggregate_records(
-                daily_rows,
-                coverage_threshold=job.coverage_threshold
-            )
-
-            return JobResult(
-                status="SUCCESS",
-                job_id=job.job_id,
-                point_id=job.point_id,
-                daily_rows=daily_rows,
-                kept_rows=kept_rows,
-                aggregated=aggregated
-            )
-
-        except Exception as e:
-            return JobResult(
-                status="FAILED",
-                job_id=job.job_id,
-                point_id=job.point_id,
-                error=str(e)
-            )
 
     def _upload_job_results(self, result: JobResult) -> None:
         """
@@ -268,12 +225,12 @@ class ScalewayStatisticsWorker:
 
         # Execute jobs
         if self.config.max_workers <= 1:
-            # Sequential execution
+            _worker_process_init(self.config.evalscript, self.config.interval, self.config.resolution)
             for i, job in enumerate(jobs, start=1):
                 if progress_callback:
                     progress_callback(i, len(jobs), job.point_id, "STARTED")
 
-                result = self._execute_single_job(job)
+                result = _execute_job_in_worker(job)
                 results.append(result)
 
                 # Upload results to storage
@@ -282,16 +239,13 @@ class ScalewayStatisticsWorker:
                 if progress_callback:
                     progress_callback(i, len(jobs), job.point_id, result.status)
         else:
-            # Parallel execution using static method to avoid pickling issues
-            with ProcessPoolExecutor(max_workers=self.config.max_workers) as executor:
+            with ProcessPoolExecutor(
+                max_workers=self.config.max_workers,
+                initializer=_worker_process_init,
+                initargs=(self.config.evalscript, self.config.interval, self.config.resolution),
+            ) as executor:
                 future_to_job = {
-                    executor.submit(
-                        self._execute_single_job_static,
-                        job,
-                        self.config.evalscript,
-                        self.config.interval,
-                        self.config.resolution
-                    ): job
+                    executor.submit(_execute_job_in_worker, job): job
                     for job in jobs
                 }
 

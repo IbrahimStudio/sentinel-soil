@@ -13,10 +13,24 @@ import json
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from sh_statistics.batch.xlsx_processor import create_xlsx_processor
 from sh_statistics.batch.scaleway_workers import create_scaleway_worker
+
+def _int_or_none(v: str) -> Optional[int]:
+    """argparse type that converts empty/blank/None strings to None.
+
+    Airflow renders a nullable Param with value None as the string "None"
+    in Jinja templates, so we handle that case explicitly.
+    """
+    if v is None:
+        return None
+    s = str(v).strip().lower()
+    if s in ("", "none", "null"):
+        return None
+    return int(s)
+
 
 def _parse_sheet_arg(sheet_arg: str) -> Any:
     """Parse sheet argument (can be name or index)"""
@@ -48,8 +62,8 @@ def _calculate_time_window_dates(survey_date: str, time_window: int) -> Tuple[st
                 survey_dt = datetime.strptime(survey_date, "%Y-%m-%d %H:%M:%S.%f").date()
             except ValueError:
                 try:
-                    # Try 2-digit year format (e.g. '16-05-18' → 2016-05-18)
-                    survey_dt = datetime.strptime(survey_date, "%y-%m-%d").date()
+                    # DD-MM-YY (e.g. '16-05-18' → 2018-05-16, LUCAS format)
+                    survey_dt = datetime.strptime(survey_date, "%d-%m-%y").date()
                 except ValueError as e:
                     # If all parsing fails, try to extract just the date portion
                     if " " in survey_date:
@@ -62,6 +76,20 @@ def _calculate_time_window_dates(survey_date: str, time_window: int) -> Tuple[st
     start_date = (survey_dt - timedelta(days=half_window)).strftime("%Y-%m-%d")
     end_date = (survey_dt + timedelta(days=half_window)).strftime("%Y-%m-%d")
     return start_date, end_date
+
+def _resolve_storage_prefix(raw: str) -> str:
+    """
+    Resolve the storage prefix, substituting {ts} with the pipeline start timestamp.
+
+    Examples:
+        "batch_results/{ts}"  →  "batch_results/20260416T103045"
+        "batch_results"       →  "batch_results"   (unchanged)
+    """
+    if "{ts}" in raw:
+        ts = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+        return raw.replace("{ts}", ts)
+    return raw
+
 
 def _progress_callback(current: int, total: int, point_id: str, status: str) -> None:
     """Progress callback for worker execution"""
@@ -80,8 +108,9 @@ def main() -> None:
     ap.add_argument("--res", type=int, default=10, help="Spatial resolution in meters (10, 20, or 60)")
     ap.add_argument("--start_date", type=str, default=None, help="Start date for all points (YYYY-MM-DD). If not provided, uses time_window around SURVEY_DATE")
     ap.add_argument("--end_date", type=str, default=None, help="End date for all points (YYYY-MM-DD). If not provided, uses time_window around SURVEY_DATE")
-    ap.add_argument("--time_window", type=int, default=None, help="Time window in days around SURVEY_DATE (e.g., 30 for 15 days before/after, 730 for 1 year before/after)")
-    ap.add_argument("--storage_prefix", type=str, default="batch_results", help="Storage prefix for results")
+    ap.add_argument("--time_window", type=_int_or_none, default=None, help="Time window in days around SURVEY_DATE (e.g., 30 for 15 days before/after, 730 for 1 year before/after)")
+    ap.add_argument("--storage_prefix", type=str, default="batch_results/{ts}",
+                    help="Storage prefix for results. Use {ts} for a run timestamp (default: batch_results/{ts})")
     # Filtering thresholds
     ap.add_argument("--ndvi_threshold", type=float, default=0.2, help="NDVI threshold for filtering")
     ap.add_argument("--mndwi_threshold", type=float, default=0.0, help="MNDWI threshold for filtering")
@@ -89,6 +118,12 @@ def main() -> None:
     ap.add_argument("--coverage_threshold", type=float, default=0.8, help="Minimum coverage threshold")
     ap.add_argument("--scl_exclude_classes", type=str, default="3,6,8,9,10,11", help="SCL classes to exclude (comma-separated)")
     args = ap.parse_args()
+
+    # Normalise empty strings (passed by docker-compose for unset env vars) to None
+    if not args.start_date:
+        args.start_date = None
+    if not args.end_date:
+        args.end_date = None
 
     # Configure logging
     logging.basicConfig(level=logging.INFO)
@@ -137,8 +172,12 @@ def main() -> None:
                     lon = float(row["TH_LONG"])
                     survey_date_str = str(row["SURVEY_DATE"])
 
-                    # Calculate time window dates
-                    if not args.start_date or not args.end_date:
+                    # Calculate time window dates.
+                    # Explicit start/end_date take precedence over time_window when both are
+                    # provided (fixed global window rather than per-survey-date window).
+                    if args.start_date and args.end_date:
+                        start_date, end_date = args.start_date, args.end_date
+                    else:
                         start_date, end_date = _calculate_time_window_dates(survey_date_str, args.time_window)
                         print(f"Point {point_id}: SURVEY_DATE={survey_date_str}, Time window: {start_date} to {end_date}")
 
@@ -173,6 +212,10 @@ def main() -> None:
 
             print(f"Prepared {len(jobs)} jobs from {args.xlsx} using time window of {args.time_window} days")
 
+            # Resolve storage prefix (substitute {ts} placeholder if present)
+            storage_prefix = _resolve_storage_prefix(args.storage_prefix)
+            print(f"Storage prefix: {storage_prefix}/")
+
             # Create Scaleway worker and execute jobs
             worker = create_scaleway_worker(
                 evalscript=evalscript,
@@ -180,7 +223,7 @@ def main() -> None:
                 resolution=args.res,
                 coverage_threshold=args.coverage_threshold,
                 max_workers=args.workers,
-                storage_prefix=args.storage_prefix
+                storage_prefix=storage_prefix
             )
 
             # Execute jobs
@@ -196,10 +239,10 @@ def main() -> None:
             print(f"\nProcessing complete:")
             print(f"Success: {success_count}/{len(results)}")
             print(f"Failed: {failure_count}/{len(results)}")
-            print(f"Results stored in Scaleway object storage with prefix: {args.storage_prefix}/")
+            print(f"Results stored in Scaleway object storage with prefix: {storage_prefix}/")
         else:
             # Use original logic with fixed dates
-            if args.start_date is None or args.end_date is None:
+            if not args.start_date or not args.end_date:
                 raise ValueError("Either time_window or both start_date and end_date must be provided")
 
             xlsx_processor = create_xlsx_processor(
@@ -226,6 +269,10 @@ def main() -> None:
             print(f"  Coverage: {args.coverage_threshold}")
             print(f"  SCL Exclude: {scl_exclude_classes}")
 
+            # Resolve storage prefix (substitute {ts} placeholder if present)
+            storage_prefix = _resolve_storage_prefix(args.storage_prefix)
+            print(f"Storage prefix: {storage_prefix}/")
+
             # Create Scaleway worker
             worker = create_scaleway_worker(
                 evalscript=evalscript,
@@ -233,7 +280,7 @@ def main() -> None:
                 resolution=args.res,
                 coverage_threshold=args.coverage_threshold,
                 max_workers=args.workers,
-                storage_prefix=args.storage_prefix
+                storage_prefix=storage_prefix
             )
 
             # Execute jobs
@@ -249,7 +296,7 @@ def main() -> None:
             print(f"\nProcessing complete:")
             print(f"Success: {success_count}/{len(results)}")
             print(f"Failed: {failure_count}/{len(results)}")
-            print(f"Results stored in Scaleway object storage with prefix: {args.storage_prefix}/")
+            print(f"Results stored in Scaleway object storage with prefix: {storage_prefix}/")
 
     except Exception as e:
         logger.error(f"Error in batch processing: {e}")

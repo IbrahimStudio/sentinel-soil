@@ -5,6 +5,65 @@ Entries are in reverse chronological order (newest first).
 
 ---
 
+## 2026-04-18 | Pipeline rerun + OAuth/client optimisation
+
+### Context
+
+Previous ingestion run (2026-04-15, full archive `2015-07-01 → 2026-04-15`) completed 0/1100 points in the Statistics API pipeline. All 1100 points landed in `batch_results/errors/` with `401 Unauthorized` against `services.sentinel-hub.com`. The 593 points already in `batch_results/aggregated/` were from an earlier partial run and were unaffected.
+
+Root cause: SH credentials were temporarily invalid at run time. Credentials are now restored and verified.
+
+### Rerun
+
+Identified failed points via `dev/audit_ingestion_run.py` (new script added this session — see below). Generated `failed_points_rerun.xlsx` (1100 rows, filtered from `gabri_filters.xlsx`) and reran with:
+
+- Date window: `2015-07-01 → 2026-04-18` (full Sentinel-2 archive, same as original run)
+- Workers: 3 (reduced from 8 to stay within SH rate limits)
+- Storage prefix: `batch_results/` (same as original run, so downstream feature-eng and training see the complete 1100-point dataset without any merge step)
+
+### New tooling: `dev/audit_ingestion_run.py`
+
+CLI script to audit any ingestion run directly from S3:
+
+```
+uv run python dev/audit_ingestion_run.py \
+  --prefix batch_results \
+  --xlsx gabri_filters.xlsx \
+  --max-age-days 0
+```
+
+Reports succeeded / failed / missing counts, shows error messages for failed points, cross-references against the source XLSX, and uploads a full `audit_results.csv` to `{prefix}/audit/`. `--max-age-days 0` disables the recency filter to show all-time results.
+
+### OAuth2 / client lifecycle optimisation
+
+**Problem:** `create_client_from_env()` was called at the top of `_execute_single_job_static` — once per job. With 1100 jobs and 3 workers this meant up to 1100 OAuth2 token fetches instead of 3. The internal token-refresh logic inside `StatisticsApiClient._get_oauth_session()` was effectively dead because the client was thrown away after every job.
+
+**Fix — `sh_statistics/client.py`:**
+
+`create_client_from_env()` now returns a **process-level singleton**. First call in a process does the OAuth handshake; all subsequent calls return the cached instance. This benefits both pipelines:
+- Pipeline A: each worker process pays the handshake cost once, regardless of how many jobs it processes
+- Pipeline B: `run_one_job()` is called per SQS message in a consumer loop — previously created a new client per message, now reuses the singleton
+
+**Fix — `sh_statistics/batch/scaleway_workers.py`:**
+
+Replaced the `ProcessPoolExecutor` approach with an explicit `initializer`:
+
+```python
+ProcessPoolExecutor(
+    max_workers=n,
+    initializer=_worker_process_init,
+    initargs=(evalscript, interval, resolution),
+)
+```
+
+`_worker_process_init` runs once per worker process and stores the SH client plus the run-level config (evalscript, interval, resolution) as module-level globals. The per-job function `_execute_job_in_worker` reads from those globals — no per-job client creation, no per-job pickling of the evalscript string.
+
+Removed the now-redundant `_execute_single_job_static` and `_execute_single_job` instance methods. The sequential path (`max_workers <= 1`) also calls `_worker_process_init` + `_execute_job_in_worker` for consistency.
+
+**Net result:** OAuth handshakes reduced from N_jobs → N_workers (1100 → 3 for the current run).
+
+---
+
 ## 2026-04-05 | Process API pipeline complete
 
 ### What was built
