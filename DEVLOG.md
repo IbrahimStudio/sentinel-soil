@@ -5,6 +5,66 @@ Entries are in reverse chronological order (newest first).
 
 ---
 
+## 2026-04-18 | Feature aggregation + training run (1 100 points, all 4 targets)
+
+### Context
+
+Ingestion rerun (see entry below) completed successfully. 1 110 points landed in `batch_results/aggregated/`; 1 100 joined with ground-truth labels after the feature-store step (10 points had no matching POINT_ID in `gabri_filters.xlsx`).
+
+### Feature store (Job 2)
+
+```
+make run-feature-store STORAGE_PREFIX=batch_results
+```
+
+Reads all JSONs under `batch_results/aggregated/`, joins with `gabri_filters.xlsx`, writes `feature_store/output/features.parquet` (1 100 rows × 39 features). No changes to the aggregator.
+
+### Training (Job 3)
+
+```
+make run-training   # ran 4 times, one target per container via TARGET env var
+```
+
+Pipeline v2, 5-fold CV (random KFold + spatial GroupKFold on 20 km grid). Best results per target:
+
+| Target | CV | Model | R² | RMSE | MAE |
+|--------|----|-------|----|------|-----|
+| Clay | random | RF n1200_leaf1_sqrt | 0.561 | 7.70 | 5.98 |
+| Clay | spatial | RF n1200_leaf1_sqrt | 0.547 | 7.86 | 6.11 |
+| Silt | random | RF n1200_leaf1_sqrt | 0.501 | 8.61 | 6.71 |
+| Silt | spatial | RF n1200_leaf1_sqrt | 0.498 | 8.65 | 6.71 |
+| Sand | random | HGB lr0.03_iter1200 | 0.408 | 13.44 | 10.59 |
+| Sand | spatial | RF n800_leaf2_sqrt | 0.388 | 13.73 | 11.00 |
+| Coarse | random | RF n1200_leaf1_sqrt | 0.252 | 11.10 | 8.52 |
+| Coarse | spatial | RF n1200_leaf1_sqrt | 0.235 | 11.25 | 8.61 |
+
+Random Forest dominates all targets. Clay/Silt are the best-behaved targets (~0.50–0.56 R²). Sand moderate (0.39–0.41). Coarse weakest (0.24–0.25) — likely a combination of sparse ground truth and high natural variability. The random vs spatial CV gap is small for Clay/Silt (≤0.01–0.02), slightly larger for Sand/Coarse, suggesting reasonable geographic generalization. Reports + fitted pipelines in `training/reports/run_20260418_21*/`.
+
+### Fixes in this session
+
+**`sh_statistics/batch/scaleway_workers.py` — year-chunked requests**
+
+Added `_year_chunks(start_date, end_date)` which splits any date range into calendar-year sub-requests. A full 10-year window (~3 650 daily intervals) was hitting SH Statistics API server timeouts; annual chunks (~365 intervals each) are reassembled in memory before parsing. The chunking is transparent to callers.
+
+**`ingestion/process_api/sh_clients.py` — correct API base URLs**
+
+Fixed two wrong endpoint URLs introduced in a previous session:
+- `https://services.sentinel-hub.com/api/v1/catalog/1.0.0/search` → `https://services.sentinel-hub.com/catalog/v1/search`
+- `https://services.sentinel-hub.com/api/v1/process` → `https://services.sentinel-hub.com/process/v1`
+
+The old paths returned 404/400; the corrected paths match the current SH API spec.
+
+**`sh_pipeline/storage.py` — `put_bytes` + `list_objects_with_metadata`**
+
+- `put_bytes(key, data, content_type)` added as a primitive; `put_text` now delegates to it.
+- `list_objects` refactored to call a new `list_objects_with_metadata` which returns `[{"key", "last_modified", "size"}]` dicts. The audit script and results analyzer both needed `last_modified` for recency filtering.
+
+**`sh_statistics/analysis/results_analyzer.py` — S3-only output**
+
+`ResultsAnalyzer.join_with_source_xlsx` and `generate_summary_report` previously wrote to local disk. Rewritten to upload directly to S3 under `{storage_prefix}/analysis/` using `put_bytes`/`put_text`. Removed the `output_dir` attribute and the `mkdir` calls that assumed a writable local filesystem.
+
+---
+
 ## 2026-04-18 | Pipeline rerun + OAuth/client optimisation
 
 ### Context

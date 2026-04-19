@@ -66,6 +66,19 @@ def _s3_env() -> dict:
             enum=["stats_api", "process_api"],
             description="stats_api: Statistics API (existing). process_api: Process API (v2, trains all 4 targets).",
         ),
+        # ── Shared date window (both pipelines) ───────────────────────
+        "START_DATE": Param(
+            "", type="string",
+            description=(
+                "Fixed start date YYYY-MM-DD for all points. "
+                "When set (together with END_DATE), overrides TIME_WINDOW / TIME_WINDOW_DAYS. "
+                "Use '2015-06-23' for the full Sentinel-2 archive."
+            ),
+        ),
+        "END_DATE": Param(
+            "", type="string",
+            description="Fixed end date YYYY-MM-DD for all points. Used together with START_DATE.",
+        ),
         # ── Statistics API params (ignored when PIPELINE_TYPE=process_api) ──
         "EVALSCRIPT": Param(
             "sh_statistics/evalscripts/only_scl.js",
@@ -76,16 +89,8 @@ def _s3_env() -> dict:
             60, type=["integer", "null"],
             description=(
                 "Total days around survey date (stats_api only, e.g. 60 → ±30 days). "
-                "Set to null/empty to use START_DATE + END_DATE for a fixed global window."
+                "Ignored when START_DATE + END_DATE are set."
             ),
-        ),
-        "START_DATE": Param(
-            "", type="string",
-            description="Fixed start date YYYY-MM-DD for all points (stats_api only, used when TIME_WINDOW is null).",
-        ),
-        "END_DATE": Param(
-            "", type="string",
-            description="Fixed end date YYYY-MM-DD for all points (stats_api only, used when TIME_WINDOW is null).",
         ),
         "NDVI_THRESHOLD": Param(
             0.2, type="number", minimum=0.0, maximum=1.0,
@@ -105,9 +110,11 @@ def _s3_env() -> dict:
         ),
         # ── Process API params (ignored when PIPELINE_TYPE=stats_api) ──
         "TIME_WINDOW_DAYS": Param(
-            365, type="integer", minimum=90, maximum=1825,
-            description="Half-width of temporal window around survey date (process_api only). "
-                        "More days = more bare-soil observations. Sentinel-2 archive from ~2017.",
+            365, type="integer", minimum=90, maximum=3650,
+            description=(
+                "Half-width of temporal window around survey date (process_api only, ignored when "
+                "START_DATE + END_DATE are set). 3650 = ±10 years; Sentinel-2 archive starts 2015-06-23."
+            ),
         ),
         "RASTER_PREFIX": Param(
             "raw_rasters/", type="string",
@@ -218,6 +225,8 @@ def soil_pipeline_v2() -> None:
             "--filter-config",     "/data/filter_config.json",
             "--evalscript",        "/data/evalscript.js",
             "--time-window-days",  "{{ params.TIME_WINDOW_DAYS }}",
+            "--start-date",        "{{ params.START_DATE }}",
+            "--end-date",          "{{ params.END_DATE }}",
             "--workers",           "{{ params.WORKERS }}",
             "--raster-prefix",     "{{ params.RASTER_PREFIX }}",
             "--limit",             "{{ params.LIMIT }}",
