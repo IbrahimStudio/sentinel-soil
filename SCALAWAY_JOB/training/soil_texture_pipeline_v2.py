@@ -111,6 +111,30 @@ def save_json(path: Path, obj: Any) -> None:
 
 TEXTURE_FRACTIONS_DEFAULT = ("Clay", "Silt", "Sand", "Coarse")
 
+# Lab chemistry columns measured on the same samples as the texture labels.
+# Including them as predictors leaks ground-truth information — drop by default.
+CHEMISTRY_COLS_DEFAULT = (
+    "pH_CaCl2", "pH_H2O", "EC", "OC", "CaCO3", "P", "N", "K",
+    "OC (20-30 cm)", "CaCO3 (20-30 cm)", "Ox_Al", "Ox_Fe",
+)
+
+# Geographic coordinates — including raw lat/lon as features causes spatial leakage:
+# the model learns "location → texture" instead of "spectrum → texture".
+# Especially harmful with spatial GroupKFold because groups are derived from these columns.
+COORD_COLS_DEFAULT = (
+    "lat", "lon", "TH_LAT", "TH_LONG", "Elev",
+)
+
+# Statistics API metadata — coverage quality metrics and processing parameters.
+# These are not spectral features; including them biases the model toward data-quality proxies.
+COVERAGE_META_COLS_DEFAULT = (
+    "coverage_threshold", "n_days_total", "n_days_kept",
+    "kept_ratio", "coverage_median_kept", "coverage_min_kept",
+)
+
+# Combined default drop set (excludes texture fractions — those are handled separately).
+NON_SPECTRAL_COLS_DEFAULT = CHEMISTRY_COLS_DEFAULT + COORD_COLS_DEFAULT + COVERAGE_META_COLS_DEFAULT
+
 
 def _to_float_series(s: pd.Series) -> pd.Series:
     if s.dtype.kind in "if":
@@ -568,6 +592,8 @@ def main():
                         help="Texture fraction columns treated as mutually exclusive predictors.")
     parser.add_argument("--no_auto_drop_texture", action="store_true",
                         help="Disable automatic dropping of other texture fractions (NOT recommended).")
+    parser.add_argument("--drop_cols", nargs="*", default=list(NON_SPECTRAL_COLS_DEFAULT),
+                        help="Columns to drop before training (default: lab chemistry, coordinates, and coverage metadata).")
 
     args = parser.parse_args()
 
@@ -609,6 +635,7 @@ def main():
         "lon_col": args.lon_col,
         "texture_cols": args.texture_cols,
         "auto_drop_other_texture_fractions": not args.no_auto_drop_texture,
+        "drop_cols": args.drop_cols,
         "timestamp": run_id,
     }
     save_json(out_dir / "config.json", config)
@@ -628,6 +655,7 @@ def main():
         try:
             Xcorr, ycorr = _prepare_xy(
                 df, target,
+                drop_cols=args.drop_cols,
                 texture_fraction_cols=args.texture_cols,
                 auto_drop_other_texture_fractions=not args.no_auto_drop_texture,
             )
@@ -649,6 +677,7 @@ def main():
                     random_state=args.random_state,
                     scale_numeric=ms.scale_numeric,
                     n_jobs=-1,
+                    drop_cols=args.drop_cols,
                     texture_fraction_cols=args.texture_cols,
                     auto_drop_other_texture_fractions=not args.no_auto_drop_texture,
                 )
