@@ -277,7 +277,8 @@ class ProcessClient(_SHAuth):
         return _tiff_to_array(content, expected_bands=N_BANDS)
 
     def _post_with_retry(self, url: str, payload: dict) -> bytes:
-        for attempt in range(self.max_retries):
+        max_attempts = max(self.max_retries, 8)  # enough retries to outlast a 429 window
+        for attempt in range(max_attempts):
             try:
                 sess = self._get_session()
                 resp = sess.post(
@@ -288,11 +289,29 @@ class ProcessClient(_SHAuth):
                 )
                 resp.raise_for_status()
                 return resp.content
+            except requests.HTTPError as exc:
+                if exc.response is not None and exc.response.status_code == 429:
+                    if attempt == max_attempts - 1:
+                        raise
+                    # Honour Retry-After header if present, else back off 60 s
+                    retry_after = int(exc.response.headers.get("Retry-After", 60))
+                    wait = max(retry_after, 60)
+                    log.warning(
+                        "Process API rate-limited (429). Waiting %ds before retry %d/%d.",
+                        wait, attempt + 1, max_attempts,
+                    )
+                    time.sleep(wait)
+                else:
+                    if attempt == max_attempts - 1:
+                        raise
+                    wait = 2 ** min(attempt, 5)
+                    log.warning("Process API attempt %d/%d failed (%s). Retrying in %ds.", attempt + 1, max_attempts, exc, wait)
+                    time.sleep(wait)
             except requests.RequestException as exc:
-                if attempt == self.max_retries - 1:
+                if attempt == max_attempts - 1:
                     raise
-                wait = 2 ** attempt
-                log.warning("Process API attempt %d/%d failed (%s). Retrying in %ds.", attempt + 1, self.max_retries, exc, wait)
+                wait = 2 ** min(attempt, 5)
+                log.warning("Process API attempt %d/%d failed (%s). Retrying in %ds.", attempt + 1, max_attempts, exc, wait)
                 time.sleep(wait)
         raise RuntimeError("unreachable")
 

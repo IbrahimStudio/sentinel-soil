@@ -20,7 +20,7 @@ import json
 import logging
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date as _date, timedelta
 from typing import Optional
 
@@ -122,6 +122,7 @@ class FetchSpec:
     lon: float
     start_date: str   # "YYYY-MM-DD"
     end_date: str
+    season_months: frozenset[int] = field(default_factory=frozenset)  # empty = all months
 
 
 def _fetch_one_point(
@@ -157,6 +158,12 @@ def _fetch_one_point(
         end_date=spec.end_date,
         catalog_prefilter=filter_config["catalog_prefilter"],
     )
+
+    # --- Seasonal filter (reduces Process API calls for quota management) ---
+    if spec.season_months:
+        scenes = [s for s in scenes if int(s.date[5:7]) in spec.season_months]
+        log.debug("%s: %d scenes after seasonal filter (months %s).",
+                  spec.point_id, len(scenes), sorted(spec.season_months))
 
     if not scenes:
         log.warning("%s: no acquisitions found (%s – %s).", spec.point_id, spec.start_date, spec.end_date)
@@ -228,6 +235,7 @@ def fetch_all_lucas_rasters(
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     workers: int = 4,
+    season_months: Optional[list[int]] = None,
 ) -> None:
     """
     Fetch raw rasters for all LUCAS points in lucas_df and store on S3.
@@ -259,12 +267,19 @@ def fetch_all_lucas_rasters(
             end_date=pt_end,
         ))
 
+    _season_set = frozenset(season_months) if season_months else frozenset()
+
     if start_date and end_date:
         log.info("Fetching rasters for %d LUCAS points (workers=%d, fixed window %s – %s).",
                  len(specs), workers, start_date, end_date)
     else:
         log.info("Fetching rasters for %d LUCAS points (workers=%d, window=±%d days).",
                  len(specs), workers, time_window_days)
+    if _season_set:
+        log.info("Seasonal filter active: only months %s will be fetched.", sorted(_season_set))
+
+    for spec in specs:
+        spec.season_months = _season_set
 
     failed: list[str] = []
     with ThreadPoolExecutor(max_workers=workers) as pool:

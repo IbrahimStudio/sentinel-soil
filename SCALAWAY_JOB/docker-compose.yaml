@@ -170,6 +170,8 @@ services:
       - "${RASTER_PREFIX:-raw_rasters/}"
       - --limit
       - "${LIMIT:--1}"
+      - --season-months
+      - "${SEASON_MONTHS:-}"
     volumes:
       - ./gabri_filters.xlsx:/data/input.xlsx:ro
       - ../DSM_WEBAPP/filter_config.json:/data/filter_config.json:ro

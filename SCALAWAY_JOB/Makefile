@@ -55,12 +55,23 @@ INGESTION_ENV = \
 # ── Process API parameters (override on the command line) ────────────────────
 TIME_WINDOW_DAYS ?= 365
 RASTER_PREFIX    ?= raw_rasters/
+# SEASON_MONTHS: comma-separated months to fetch (empty = all months).
+# Recommended for quota management: 10,11,12,1,2,3,4  (Oct–Apr bare-soil window)
+SEASON_MONTHS    ?=
+# START_DATE / END_DATE: fixed window for all points (YYYY-MM-DD).
+# When both are set, TIME_WINDOW_DAYS is ignored.
+# Example: make run-ingestion-v2 START_DATE=2019-01-01 END_DATE=2026-05-16
+START_DATE       ?=
+END_DATE         ?=
 
 INGESTION_V2_ENV = \
   $(_BUCKET_ENV) \
   WORKERS=$(WORKERS) \
   TIME_WINDOW_DAYS=$(TIME_WINDOW_DAYS) \
+  START_DATE=$(START_DATE) \
+  END_DATE=$(END_DATE) \
   RASTER_PREFIX=$(RASTER_PREFIX) \
+  SEASON_MONTHS=$(SEASON_MONTHS) \
   LIMIT=$(LIMIT)
 
 ## build: build Statistics API images (ingestion:stats-api, feature-store:latest, training:stats-api)

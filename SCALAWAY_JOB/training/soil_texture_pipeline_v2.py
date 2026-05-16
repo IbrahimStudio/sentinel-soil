@@ -580,6 +580,7 @@ def main():
     parser.add_argument("--top_k", type=int, default=30, help="Top K features for importance reports.")
     parser.add_argument("--do_perm_importance", action="store_true", help="Compute permutation importance.")
     parser.add_argument("--do_shap", action="store_true", help="Compute SHAP plots for tree models (requires shap).")
+    parser.add_argument("--mlflow", action="store_true", help="Log every run to MLflow (requires evaluation/ package and mlflow installed).")
 
     # spatial CV
     parser.add_argument("--group_col", default=None, help="Existing group column for spatial CV (optional).")
@@ -602,6 +603,21 @@ def main():
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_dir = Path(args.output_dir) / f"run_{run_id}"
     ensure_dir(out_dir)
+
+    _mlflow_log = None
+    if args.mlflow:
+        try:
+            import sys as _sys
+            _sys.path.insert(0, str(Path(__file__).parent.parent))
+            from evaluation.config import from_env as _eval_cfg
+            from evaluation.mlflow_client import setup as _mlflow_setup, log_training_run as _mlflow_log_run
+            _cfg = _eval_cfg()
+            _mlflow_setup(_cfg)
+            _mlflow_log = _mlflow_log_run
+            print(f"[MLflow] tracking URI: {_cfg.tracking_uri}")
+            print(f"[MLflow] artifact root: {_cfg.artifact_root}")
+        except Exception as _e:
+            print(f"[WARN] MLflow init failed ({_e}). Proceeding without tracking.")
 
     # spatial group
     effective_group_col = args.group_col
@@ -687,8 +703,10 @@ def main():
                 results["cv_mode"] = cv_mode
                 summary_rows.append(results)
 
-                fold_df.to_csv(out_dir / f"fold_scores__{target}__{ms.name}__{ms.config}__{results['cv_type']}.csv", index=False)
-                dump(pipe, out_dir / f"pipeline__{target}__{ms.name}__{ms.config}__{results['cv_type']}.joblib")
+                fold_csv = out_dir / f"fold_scores__{target}__{ms.name}__{ms.config}__{results['cv_type']}.csv"
+                joblib_path = out_dir / f"pipeline__{target}__{ms.name}__{ms.config}__{results['cv_type']}.joblib"
+                fold_df.to_csv(fold_csv, index=False)
+                dump(pipe, joblib_path)
                 save_json(out_dir / f"metrics__{target}__{ms.name}__{ms.config}__{results['cv_type']}.json", results)
 
                 if ms.rf_importance:
@@ -707,9 +725,33 @@ def main():
                     except Exception as e:
                         print(f"  [WARN] Permutation importance failed: {e}")
 
+                shap_prefix = out_dir / f"{target}__{ms.name}__{ms.config}__{results['cv_type']}"
                 if args.do_shap and ms.shap_ok:
-                    out_prefix = out_dir / f"{target}__{ms.name}__{ms.config}__{results['cv_type']}"
-                    try_shap_plots(pipe, X_used, out_prefix=out_prefix)
+                    try_shap_plots(pipe, X_used, out_prefix=shap_prefix)
+
+                if _mlflow_log is not None:
+                    try:
+                        coord_cols = {"lat", "lon", "TH_LAT", "TH_LONG", "Elev"}
+                        dropped = set(args.drop_cols)
+                        feature_set = "spectral_only" if coord_cols.issubset(dropped) else "spectral_coords"
+                        imp_csv = out_dir / f"feature_importance__{target}__{ms.name}__{ms.config}__{results['cv_type']}.csv"
+                        _mlflow_log(
+                            target=target,
+                            model_name=ms.name,
+                            model_config=ms.config,
+                            results=results,
+                            run_batch=run_id,
+                            feature_set=feature_set,
+                            random_state=args.random_state,
+                            block_size_m=args.block_size_m,
+                            model=ms.model,
+                            fold_csv=fold_csv,
+                            importance_csv=imp_csv if imp_csv.exists() else None,
+                            shap_bar_png=shap_prefix.with_name(shap_prefix.name + "__shap_summary_bar.png") if args.do_shap else None,
+                            shap_dot_png=shap_prefix.with_name(shap_prefix.name + "__shap_summary_dot.png") if args.do_shap else None,
+                        )
+                    except Exception as _e:
+                        print(f"  [WARN] MLflow logging failed ({_e}). Continuing.")
 
         tmp_summary = pd.DataFrame(summary_rows)
         plot_model_comparison(tmp_summary, target, out_dir / f"model_comparison__{target}.png")

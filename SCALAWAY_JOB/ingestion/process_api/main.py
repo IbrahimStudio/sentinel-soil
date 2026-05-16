@@ -42,7 +42,26 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--workers",         type=int,  default=4,    help="Parallel fetch threads (I/O bound)")
     p.add_argument("--raster-prefix",   default="raw_rasters/",             help="S3 prefix for storing raw rasters")
     p.add_argument("--limit",           type=int,  default=-1,   help="Process only first N rows (-1 = all). Use small values for testing.")
+    p.add_argument("--season-months",   type=str,  default=None,
+                   metavar="M,M,...",
+                   help="Comma-separated calendar months to fetch (1=Jan … 12=Dec). "
+                        "Empty or omitted = fetch all months. "
+                        "Example for Oct-Apr bare-soil window: --season-months 10,11,12,1,2,3,4")
     return p.parse_args()
+
+
+def _parse_season_months(raw: str | None) -> list[int] | None:
+    """Parse comma-separated month string. Returns None (= all months) if empty."""
+    if not raw or not raw.strip():
+        return None
+    try:
+        months = [int(m.strip()) for m in raw.split(",") if m.strip()]
+        invalid = [m for m in months if not 1 <= m <= 12]
+        if invalid:
+            raise ValueError(f"Month values out of range 1–12: {invalid}")
+        return months
+    except ValueError as e:
+        raise SystemExit(f"Invalid --season-months value '{raw}': {e}") from e
 
 
 def main() -> None:
@@ -106,6 +125,7 @@ def main() -> None:
         start_date=args.start_date,
         end_date=args.end_date,
         workers=args.workers,
+        season_months=_parse_season_months(args.season_months),
     )
 
     log.info("Ingestion complete.")
