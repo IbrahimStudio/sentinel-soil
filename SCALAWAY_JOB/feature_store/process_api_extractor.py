@@ -27,12 +27,34 @@ import json
 import logging
 from typing import Optional
 
+import re
+
 import boto3
 import numpy as np
 import pandas as pd
 from botocore.config import Config as BotoConfig
 
 log = logging.getLogger(__name__)
+
+
+def _normalise_endpoint(endpoint: str) -> str:
+    """Strip the bucket prefix from Scaleway virtual-hosted endpoint URLs.
+
+    Scaleway Object Storage uses virtual-hosted URLs of the form
+    https://<bucket>.s3.<region>.scw.cloud which embed the bucket name in the
+    hostname.  When boto3 path-style addressing is used from outside Scaleway's
+    own infrastructure the bucket-prefixed hostname causes NoSuchKey errors
+    because boto3 generates paths like /soil-sentinel/key against a hostname
+    that already resolves to that bucket.
+
+    Strip the prefix to get the base endpoint (https://s3.<region>.scw.cloud)
+    so path-style requests are formed as /soil-sentinel/key against the plain
+    regional endpoint, which Scaleway handles correctly.
+    """
+    m = re.match(r"(https://)[^.]+\.(s3\.[^.]+\.scw\.cloud)", endpoint)
+    if m:
+        return f"{m.group(1)}{m.group(2)}"
+    return endpoint
 
 # Band index constants — must match evalscript_process_api.js band order.
 _B04 = 2
@@ -61,10 +83,15 @@ def _safe_nd(a: np.ndarray, b: np.ndarray) -> np.ndarray:
 # ---------------------------------------------------------------------------
 
 def _make_s3(endpoint: str, bucket: str, access_key: str, secret_key: str):
-    cfg = BotoConfig(retries={"max_attempts": 6, "mode": "standard"}, connect_timeout=15, read_timeout=120)
+    cfg = BotoConfig(
+        retries={"max_attempts": 6, "mode": "standard"},
+        connect_timeout=15,
+        read_timeout=120,
+        s3={"addressing_style": "path"},
+    )
     client = boto3.client(
         "s3",
-        endpoint_url=endpoint,
+        endpoint_url=_normalise_endpoint(endpoint),
         region_name="fr-par",
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_key,
@@ -287,15 +314,18 @@ def _sanity_check(df: pd.DataFrame) -> None:
         elif df[col].nunique() <= 1:
             issues.append(f"Feature column '{col}' is constant (value={df[col].iloc[0]:.4f}) — will contribute nothing to the model.")
 
-    # --- Target sum check (Clay + Silt + Sand + Coarse ≈ 100) ---
-    target_cols = [c for c in ["Clay", "Silt", "Sand", "Coarse"] if c in df.columns]
-    if len(target_cols) == 4:
-        total = df[target_cols].sum(axis=1)
+    # --- Target sum check (Clay + Silt + Sand ≈ 100; Coarse is gravel/rock, separate) ---
+    # In LUCAS, Coarse = coarse fragments expressed as % of total soil volume — it is NOT
+    # part of the fine-earth texture triangle. Clay+Silt+Sand should sum to ~100;
+    # Clay+Silt+Sand+Coarse will legitimately exceed 100 for rocky soils.
+    fine_cols = [c for c in ["Clay", "Silt", "Sand"] if c in df.columns]
+    if len(fine_cols) == 3:
+        total = df[fine_cols].sum(axis=1)
         bad = (total < 85) | (total > 115)
         n_bad = int(bad.sum())
         if n_bad > 0:
             issues.append(
-                f"{n_bad} rows have Clay+Silt+Sand+Coarse outside [85,115] "
+                f"{n_bad} rows have Clay+Silt+Sand outside [85,115] "
                 f"(min={total.min():.1f}, max={total.max():.1f}) — check label quality."
             )
 
