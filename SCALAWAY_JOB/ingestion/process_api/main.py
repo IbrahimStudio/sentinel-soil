@@ -3,18 +3,13 @@ Job 1v2 – Process API Raster Ingestion entry point.
 
 For each LUCAS point:
   1. Check S3 for existing raw raster — skip if present
-  2. Query Catalog API for acquisitions within the time window
-  3. Fetch 9×9 raster per date via Process API
+  2. Fetch ALL orbit passes in one multi-temporal Process API request
+  3. Apply seasonal month filter client-side
   4. Store .npz + _meta.json to S3
 
 Environment variables (forwarded by Airflow/docker-compose):
     SH_CLIENT_ID, SH_CLIENT_SECRET
     SCALEWAY_S3_ENDPOINT, SCALEWAY_S3_BUCKET, SCALEWAY_ACCESS_KEY, SCALEWAY_SECRET_KEY
-
-Runtime mounts:
-    /data/input.xlsx          — gabri_filters.xlsx (read-only)
-    /data/filter_config.json  — filter_config.json (read-only)
-    /data/evalscript.js       — evalscript_process_api.js (read-only)
 """
 
 from __future__ import annotations
@@ -32,26 +27,23 @@ from sh_clients import clients_from_env
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Process API raster ingestion")
-    p.add_argument("--xlsx",            default="/data/input.xlsx",         help="Path to gabri_filters.xlsx")
-    p.add_argument("--filter-config",   default="/data/filter_config.json", help="Path to filter_config.json")
-    p.add_argument("--evalscript",      default="/data/evalscript.js",      help="Path to evalscript_process_api.js")
-    p.add_argument("--time-window-days",type=int,  default=365,  help="Half-width temporal window around survey date (days). Ignored when --start-date/--end-date are set.")
-    p.add_argument("--start-date",      default=None, help="Fixed start date for all points (YYYY-MM-DD). Overrides --time-window-days.")
-    p.add_argument("--end-date",        default=None, help="Fixed end date for all points (YYYY-MM-DD). Overrides --time-window-days.")
-    p.add_argument("--workers",         type=int,  default=4,    help="Parallel fetch threads (I/O bound)")
-    p.add_argument("--raster-prefix",   default="raw_rasters/",             help="S3 prefix for storing raw rasters")
-    p.add_argument("--limit",           type=int,  default=-1,   help="Process only first N rows (-1 = all). Use small values for testing.")
-    p.add_argument("--season-months",   type=str,  default=None,
-                   metavar="M,M,...",
-                   help="Comma-separated calendar months to fetch (1=Jan … 12=Dec). "
-                        "Empty or omitted = fetch all months. "
-                        "Example for Oct-Apr bare-soil window: --season-months 10,11,12,1,2,3,4")
+    p = argparse.ArgumentParser(description="Process API raster ingestion (multi-temporal)")
+    p.add_argument("--xlsx",             default="/data/input.xlsx",         help="Path to gabri_filters.xlsx")
+    p.add_argument("--evalscript",       default="/data/evalscript.js",      help="Per-date evalscript (legacy fallback)")
+    p.add_argument("--evalscript-mt",    default="/data/evalscript_mt.js",   help="Multi-temporal evalscript (evalscript_multitemporal.js)")
+    p.add_argument("--time-window-days", type=int, default=365, help="Half-width window around survey date (days). Ignored when --start-date/--end-date are set.")
+    p.add_argument("--start-date",       default=None, help="Fixed start date for all points (YYYY-MM-DD).")
+    p.add_argument("--end-date",         default=None, help="Fixed end date for all points (YYYY-MM-DD).")
+    p.add_argument("--workers",          type=int, default=4, help="Parallel fetch threads")
+    p.add_argument("--raster-prefix",    default="raw_rasters/", help="S3 prefix for raw rasters")
+    p.add_argument("--limit",            type=int, default=-1, help="Process only first N rows (-1 = all)")
+    p.add_argument("--season-months",    type=str, default=None, metavar="M,M,...",
+                   help="Comma-separated months to keep after fetch (1=Jan … 12=Dec). "
+                        "Example for bare-soil window: --season-months 10,11,12,1,2,3,4")
     return p.parse_args()
 
 
 def _parse_season_months(raw: str | None) -> list[int] | None:
-    """Parse comma-separated month string. Returns None (= all months) if empty."""
     if not raw or not raw.strip():
         return None
     try:
@@ -76,7 +68,6 @@ def main() -> None:
 
     args = parse_args()
 
-    # docker-compose renders unset env vars as empty strings — normalise to None
     if not args.start_date:
         args.start_date = None
     if not args.end_date:
@@ -86,16 +77,11 @@ def main() -> None:
     if not fixed_dates and not (90 <= args.time_window_days <= 3650):
         sys.exit("--time-window-days must be in [90, 3650]")
 
-    # --- Load filter config ---
-    import json
-    with open(args.filter_config) as f:
-        filter_config = json.load(f)
-    log.info("filter_config version=%s", filter_config.get("version"))
+    # Load evalscripts
+    evalscript    = open(args.evalscript).read()
+    evalscript_mt = open(args.evalscript_mt).read()
 
-    # --- Load evalscript ---
-    evalscript = open(args.evalscript).read()
-
-    # --- Load LUCAS points ---
+    # Load LUCAS points
     lucas_df = pd.read_excel(args.xlsx)
     if args.limit > 0:
         lucas_df = lucas_df.head(args.limit)
@@ -107,14 +93,12 @@ def main() -> None:
 
     log.info("Loaded %d LUCAS points.", len(lucas_df))
 
-    # --- Build API clients ---
-    catalog, process = clients_from_env(evalscript)
+    # Build API clients
+    _, process = clients_from_env(evalscript, evalscript_mt)
 
-    # --- Fetch rasters ---
+    # Fetch rasters
     fetch_all_lucas_rasters(
         lucas_df,
-        filter_config,
-        catalog,
         process,
         s3_endpoint=   os.environ["SCALEWAY_S3_ENDPOINT"],
         s3_bucket=     os.environ["SCALEWAY_S3_BUCKET"],

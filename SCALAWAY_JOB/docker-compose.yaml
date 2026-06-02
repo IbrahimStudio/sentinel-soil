@@ -154,8 +154,6 @@ services:
       - main.py
       - --xlsx
       - /data/input.xlsx
-      - --filter-config
-      - /data/filter_config.json
       - --evalscript
       - /data/evalscript.js
       - --time-window-days
@@ -170,12 +168,14 @@ services:
       - "${RASTER_PREFIX:-raw_rasters/}"
       - --limit
       - "${LIMIT:--1}"
+      - --evalscript-mt
+      - /data/evalscript_mt.js
       - --season-months
       - "${SEASON_MONTHS:-}"
     volumes:
       - ./gabri_filters.xlsx:/data/input.xlsx:ro
-      - ../DSM_WEBAPP/filter_config.json:/data/filter_config.json:ro
       - ../DSM_WEBAPP/evalscript_process_api.js:/data/evalscript.js:ro
+      - ../DSM_WEBAPP/evalscript_multitemporal.js:/data/evalscript_mt.js:ro
     env_file: .env
     environment:
       # SH credentials come from env_file only — see comment on ingestion service.
